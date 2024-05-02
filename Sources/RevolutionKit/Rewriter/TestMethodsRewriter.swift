@@ -18,12 +18,14 @@ final class TestMethodsRewriter: SyntaxRewriter {
         case .testCase:
             return rewriteTestCase(node: node)
         case .setUp:
-            return DeclSyntax(node)
+            return rewriteSetUp(node: node)
         case .tearDown:
             return DeclSyntax(node)
         }
     }
     
+    /// Rewrite XCTest test case methods to swift-testing
+    /// func testExample() -> @Test func example()
     private func rewriteTestCase(node: FunctionDeclSyntax) -> DeclSyntax {
         let testCaseName = node.name.text
         let newTestCaseName = if globalOptions.enableStrippingTestPrefix {
@@ -52,6 +54,40 @@ final class TestMethodsRewriter: SyntaxRewriter {
         return DeclSyntax(newSigniture)
     }
     
+    /// Rewrite XCTest setUp methods to initializers
+    private func rewriteSetUp(node: FunctionDeclSyntax) -> DeclSyntax {
+        let shouldAddThrows = node.name.text == "setUpWithError"
+        
+        let effectSpecifiers: FunctionEffectSpecifiersSyntax?
+        if shouldAddThrows {
+            let emptyEffectSpecifiers = FunctionEffectSpecifiersSyntax()
+            effectSpecifiers = emptyEffectSpecifiers.with(\.throwsSpecifier, .keyword(.throws))
+        } else {
+            effectSpecifiers = node.signature.effectSpecifiers
+        }
+        
+        let initializerDecl = InitializerDeclSyntax(
+            leadingTrivia: node.leadingTrivia,
+            attributes: node.attributes,
+            modifiers: node.modifiers,
+            signature: FunctionSignatureSyntax(
+                parameterClause: FunctionParameterClauseSyntax(
+                    parameters: FunctionParameterListSyntax()
+                ),
+                effectSpecifiers: effectSpecifiers
+            ),
+            body: node.body,
+            trailingTrivia: node.trailingTrivia
+        )
+        
+        return DeclSyntax(initializerDecl)
+    }
+    
+    /// Rewrite XCTest tearDown methods to destructors
+    private func rewriteTearDown(node: FunctionDeclSyntax) -> DeclSyntax {
+        return DeclSyntax(node)
+    }
+    
     /// Strip first `test` prefix from test case names.
     /// `testCamelCase` -> `camelCase`
     /// `test` -> `test`
@@ -73,12 +109,13 @@ final class TestMethodsRewriter: SyntaxRewriter {
     private func detectMethodKind(of node: FunctionDeclSyntax) -> MethodKind? {
         guard !isStaticMethod(node: node) else { return nil }
         
-        return switch node.name {
-        case let name where name.text.hasPrefix("test"):
-                .testCase(name.text)
-        case let name where name.text == "setUp":
+        return switch node.name.text {
+        case let name where name.hasPrefix("test"):
+                .testCase(name)
+        case let name where ["setUp", "setUpWithError"].contains(name):
                 .setUp
-        case let name where name.text == "tearDown":
+        case let name where ["tearDown"].contains(name):
+            // We can't support `tearDownWithError` because the destructors can't throw any errors.
                 .tearDown
         default:
             nil
