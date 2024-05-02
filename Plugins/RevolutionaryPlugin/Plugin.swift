@@ -1,3 +1,10 @@
 import Foundation
+import PackagePlugin
 
-// TBD
+@main
+struct SwiftTestingRevolutionaryPlugin: CommandPlugin {
+    func performCommand(context: PackagePlugin.PluginContext, arguments: [String]) async throws {
+        // TBD
+    }
+    
+}

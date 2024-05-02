@@ -13,6 +13,10 @@ let package = Package(
             name: "swift-testing-revolutionary",
             targets: ["swift-testing-revolutionary"]
         ),
+        .library(
+            name: "RevolutionKit",
+            targets: ["RevolutionKit"]
+        ),
         .plugin(
             name: "RevolutionaryPlugin",
             targets: ["RevolutionaryPlugin"]
@@ -23,12 +27,17 @@ let package = Package(
             url: "https://github.com/apple/swift-syntax.git",
             .upToNextMajor(from: "510.0.1")
         ),
+        .package(
+            url: "https://github.com/apple/swift-testing.git",
+            from: "0.7.0"
+        ),
     ],
     targets: [
         .target(
             name: "RevolutionKit",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
             ]
         ),
         .plugin(
@@ -38,7 +47,9 @@ let package = Package(
                     verb: "revolt",
                     description: "Convert XCTest cases to swift-testing"
                 ),
-                permissions: [.writeToPackageDirectory(reason: "Rewrite implementations")]
+                permissions: [
+                    .writeToPackageDirectory(reason: "Rewrite implementations")
+                ]
             )
         ),
         .executableTarget(
@@ -51,6 +62,7 @@ let package = Package(
             name: "RevolutionKitTests",
             dependencies: [
                 .target(name: "RevolutionKit"),
+                .product(name: "Testing", package: "swift-testing"),
             ]
         ),
     ]
