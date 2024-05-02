@@ -29,7 +29,17 @@ final class HogeTests: NoTest {
 }
 """,
         expected: """
-final class HogeTests: NoTest {
+struct HogeTests {
+}
+"""
+    ),
+    .init(
+        source: """
+final class NotATestClass {
+}
+""",
+        expected: """
+final class NotATestClass {
 }
 """
     ),
