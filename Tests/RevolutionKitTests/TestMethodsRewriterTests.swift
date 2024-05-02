@@ -15,6 +15,17 @@ private let testCaseConversionFixtures: [ConversionTestFixture] = [
     ),
     .init(
         """
+        @MainActor func testExample() {
+        }
+        """,
+        """
+        @Test @MainActor func example() {
+        }
+        """
+    ),
+
+    .init(
+        """
         static func testExample() {
         }
         """,

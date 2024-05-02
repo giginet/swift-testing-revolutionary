@@ -42,8 +42,8 @@ final class TestMethodsRewriter: SyntaxRewriter {
         )
         
         let attributes = {
-            var attributes = AttributeListSyntax()
-            attributes.append(.attribute(testMacroAttribute))
+            var attributes = node.attributes
+            attributes.insert(.attribute(testMacroAttribute), at: attributes.startIndex)
             return attributes
         }()
         
