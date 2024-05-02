@@ -9,7 +9,7 @@ private let fixtures: [Fixture] = [
 private struct ImportStatementRewriterTests {
     private let emitter = StringEmitter()
     
-    @Test("All rewriters can convert syntaxes", arguments: fixtures)
+    @Test("ImportStatementRewriter can rewrites all import statements", arguments: fixtures)
     private func rewriter(_ fixture: Fixture) throws {
         let runner = Runner(rewriter: ImportStatementRewriter())
         
