@@ -17,6 +17,11 @@ private enum TraversalError: Error {
 }
 
 extension SyntaxProtocol {
+    func first<S: SyntaxProtocol>(of kind: SyntaxKind, as: S.Type) -> S? {
+        let syntax = children(viewMode: .sourceAccurate).first(of: kind)
+        return syntax?.as(S.self)
+    }
+    
     func traverse(kinds: [SyntaxKind]) -> Syntax? {
         do {
             return try kinds.reduce(_syntaxNode) { node, kind in

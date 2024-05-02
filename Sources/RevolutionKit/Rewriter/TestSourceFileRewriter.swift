@@ -6,6 +6,7 @@ class TestSourceFileRewriter: SyntaxRewriter {
     private let globalOptions: GlobalOptions
     private lazy var importStatementRewriter = ImportStatementRewriter()
     private lazy var testClassRewriter = TestClassRewriter(globalOptions: globalOptions)
+    private lazy var assertionRewriter = AssertionRewriter(globalOptions: globalOptions)
     
     init(globalOptions: GlobalOptions) {
         self.globalOptions = globalOptions
@@ -24,6 +25,6 @@ class TestSourceFileRewriter: SyntaxRewriter {
     }
     
     override func visit(_ node: FunctionCallExprSyntax) -> ExprSyntax {
-        super.visit(node)
+        assertionRewriter.visit(node)
     }
 }
