@@ -3,11 +3,38 @@ import SwiftSyntax
 
 /// Rewriter to rewrite test XCTestCase class into swift-testing struct
 final class TestClassRewriter: SyntaxRewriter {
+    private let globalOptions: GlobalOptions
+    
+    init(globalOptions: GlobalOptions) {
+        self.globalOptions = globalOptions
+    }
+    
     override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
         guard guessWhetherTestCaseClass(node) else {
             return super.visit(node)
         }
         
+        if shouldConvertToStruct {
+            return buildStruct(from: node)
+        } else {
+            return buildSwiftTestingClass(from: node)
+        }
+    }
+    
+    /// Build class decl removing inheritance of XCTestCase
+    private func buildSwiftTestingClass(from node: ClassDeclSyntax) -> DeclSyntax {
+        let newNode = node
+            .with(\.inheritanceClause, InheritanceClauseSyntax(
+                colon: .unknown(""),
+                inheritedTypes: [],
+                trailingTrivia: .spaces(1))
+            )
+        return DeclSyntax(newNode)
+    }
+    
+    /// Build struct decl from ClassDeclSyntax
+    /// Note: It doesn't return StructDeclSyntax
+    private func buildStruct(from node: ClassDeclSyntax) -> DeclSyntax {
         // We can't convert ClassDecl to StructDecl, so we just replace some parameters instead.
         let newNode = node
             .with(\.classKeyword, .keyword(.struct, trailingTrivia: .spaces(1)))
@@ -17,8 +44,11 @@ final class TestClassRewriter: SyntaxRewriter {
                 inheritedTypes: [],
                 trailingTrivia: .spaces(1))
             )
-        
         return DeclSyntax(newNode)
+    }
+    
+    private var shouldConvertToStruct: Bool {
+        return globalOptions.enableStructConversion
     }
     
     /// Guess the passed ClassDecl would be TestCase class or not

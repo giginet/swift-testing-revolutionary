@@ -4,8 +4,8 @@ import SwiftSyntax
 /// Rewriter for the whole test file. It expects to be used for SourceFileSyntax
 class TestSourceFileRewriter: SyntaxRewriter {
     private let globalOptions: GlobalOptions
-    private let importStatementRewriter = ImportStatementRewriter()
-    private let testClassRewriter = TestClassRewriter()
+    private lazy var importStatementRewriter = ImportStatementRewriter()
+    private lazy var testClassRewriter = TestClassRewriter(globalOptions: globalOptions)
     
     init(globalOptions: GlobalOptions) {
         self.globalOptions = globalOptions

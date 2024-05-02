@@ -1,6 +1,6 @@
 import Foundation
 
-struct Fixture {
+struct ConversionTestFixtures {
     let source: String
     let expected: String
 }

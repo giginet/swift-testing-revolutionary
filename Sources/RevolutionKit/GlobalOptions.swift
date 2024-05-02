@@ -23,11 +23,11 @@ package struct GlobalOptions {
     }
     
     package init(
-        isDryRunMode: Bool,
-        backupMode: BackUpMode,
-        shouldSkipIfUnsupportedAPI: Bool,
-        enableStructConversion: Bool,
-        enableStrippingTestPrefix: Bool
+        isDryRunMode: Bool = false,
+        backupMode: BackUpMode = .disabled,
+        shouldSkipIfUnsupportedAPI: Bool = true,
+        enableStructConversion: Bool = true,
+        enableStrippingTestPrefix: Bool = true
     ) {
         self.isDryRunMode = isDryRunMode
         self.backupMode = backupMode
@@ -38,11 +38,5 @@ package struct GlobalOptions {
 }
 
 extension GlobalOptions {
-    package static let `default`: Self = .init(
-        isDryRunMode: false,
-        backupMode: .disabled,
-        shouldSkipIfUnsupportedAPI: true,
-        enableStructConversion: true,
-        enableStrippingTestPrefix: true
-    )
+    package static let `default`: Self = .init()
 }
