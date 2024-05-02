@@ -2,24 +2,20 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 
-protocol Emitter {
-    associatedtype EmitType
-    
-    func emit(sourceFileSyntax: SourceFileSyntax) -> EmitType
-}
-
-struct StringEmitter: Emitter {
-    typealias EmitType = String
-    
-    func emit(sourceFileSyntax: SourceFileSyntax) -> EmitType {
-        sourceFileSyntax.description
-    }
-}
-
 package struct Runner {
+    private let globalOptions: GlobalOptions
     private let rewriter: SyntaxRewriter
     
-    init(rewriter: SyntaxRewriter = TestSourceFileRewriter()) {
+    init(globalOptions: GlobalOptions = .default) {
+        self.globalOptions = globalOptions
+        self.rewriter = TestSourceFileRewriter(globalOptions: globalOptions)
+    }
+    
+    init(
+        globalOptions: GlobalOptions = .default,
+        rewriter: SyntaxRewriter
+    ) {
+        self.globalOptions = globalOptions
         self.rewriter = rewriter
     }
     
