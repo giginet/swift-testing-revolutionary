@@ -20,7 +20,7 @@ final class TestMethodsRewriter: SyntaxRewriter {
         case .setUp:
             return rewriteSetUp(node: node)
         case .tearDown:
-            return DeclSyntax(node)
+            return rewriteTearDown(node: node)
         }
     }
     
@@ -55,9 +55,12 @@ final class TestMethodsRewriter: SyntaxRewriter {
     }
     
     /// Rewrite XCTest setUp methods to initializers
+    /// func setUp() -> init()
+    /// func setUpWithError() -> init() throws
     private func rewriteSetUp(node: FunctionDeclSyntax) -> DeclSyntax {
         let shouldAddThrows = node.name.text == "setUpWithError"
         
+        // If the method was `setUpWithError`, add `throws` as a function effect specifier
         let effectSpecifiers: FunctionEffectSpecifiersSyntax?
         if shouldAddThrows {
             let emptyEffectSpecifiers = FunctionEffectSpecifiersSyntax()
@@ -70,7 +73,6 @@ final class TestMethodsRewriter: SyntaxRewriter {
             effectSpecifiers = node.signature.effectSpecifiers
         }
         
-        print(node.attributes)
         let initializerDecl = InitializerDeclSyntax(
             leadingTrivia: node.leadingTrivia,
             attributes: node.attributes,
@@ -91,7 +93,20 @@ final class TestMethodsRewriter: SyntaxRewriter {
     
     /// Rewrite XCTest tearDown methods to destructors
     private func rewriteTearDown(node: FunctionDeclSyntax) -> DeclSyntax {
-        return DeclSyntax(node)
+        precondition(node.name.text == "tearDown")
+        
+        // TODO: If tearDown method has any function effect specifiers,
+        // warn about this because it might not be compiled
+        
+        let deinitializerDecl = DeinitializerDeclSyntax(
+            leadingTrivia: node.leadingTrivia,
+            attributes: node.attributes,
+            modifiers: node.modifiers,
+            body: node.body?.with(\.leadingTrivia, .space),
+            trailingTrivia: node.trailingTrivia
+        )
+        
+        return DeclSyntax(deinitializerDecl)
     }
     
     /// Strip first `test` prefix from test case names.
@@ -112,6 +127,7 @@ final class TestMethodsRewriter: SyntaxRewriter {
         }()
     }
     
+    /// Returns a kind of the method
     private func detectMethodKind(of node: FunctionDeclSyntax) -> MethodKind? {
         guard !isStaticMethod(node: node) else { return nil }
         
@@ -128,6 +144,7 @@ final class TestMethodsRewriter: SyntaxRewriter {
         }
     }
     
+    /// Returns true if the method is static
     private func isStaticMethod(node: FunctionDeclSyntax) -> Bool {
         node.modifiers.contains {
             $0.tokens(viewMode: .sourceAccurate).contains { $0.tokenKind == .keyword(.static) }

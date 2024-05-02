@@ -86,14 +86,36 @@ private let setUpConversionFixtures: [ConversionTestFixture] = [
         }
         """
     ),
+]
+
+private let tearDownConversionFixtures: [ConversionTestFixture] = [
     .init(
         """
-        @MainActor 
-        func setUp() async throws {
+        func tearDown() {
         }
         """,
         """
-        @MainActor init() async throws {
+        deinit {
+        }
+        """
+    ),
+    .init(
+        """
+        func tearDown() async throws {
+        }
+        """,
+        """
+        deinit {
+        }
+        """
+    ),
+    .init(
+        """
+        static func tearDown() {
+        }
+        """,
+        """
+        static func tearDown() {
         }
         """
     ),
@@ -112,6 +134,14 @@ struct TestMethodsRewriterTests {
     
     @Test("TestMethodsRewriter can convert setUp methods", arguments: setUpConversionFixtures)
     private func rewriteSetUps(_ fixture: ConversionTestFixture) throws {
+        let runner = Runner(rewriter: TestMethodsRewriter(globalOptions: .default))
+        
+        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        #expect(result == fixture.expected)
+    }
+    
+    @Test("TestMethodsRewriter can convert tearDown methods", arguments: tearDownConversionFixtures)
+    private func rewriteTearDowns(_ fixture: ConversionTestFixture) throws {
         let runner = Runner(rewriter: TestMethodsRewriter(globalOptions: .default))
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
