@@ -19,3 +19,13 @@ struct ImportStatementRule: RewriteRule {
         token.previousToken(viewMode: .sourceAccurate)?.tokenKind == .keyword(.import)
     }
 }
+
+struct TestClassRule: RewriteRule {
+    static func rewrite(_ token: TokenSyntax) -> TokenSyntax {
+        token
+    }
+    
+    static func shouldRewrite(for token: TokenSyntax) -> Bool {
+        false
+    }
+}

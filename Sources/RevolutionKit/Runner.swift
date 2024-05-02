@@ -21,7 +21,7 @@ private let defaultRuleSets = [
 ]
 
 package struct Runner {
-    private let rewriter: TestCaseRewriter
+    private let rewriter: TestSourceFileRewriter
     
     init(rules: RuleSets = defaultRuleSets) {
         rewriter = .init(rules: rules)
