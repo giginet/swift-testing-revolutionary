@@ -6,6 +6,8 @@ protocol RewriteRule {
     static func shouldRewrite(for token: TokenSyntax) -> Bool
 }
 
+typealias RuleSets = [any RewriteRule.Type]
+
 struct ImportStatementRule: RewriteRule {
     static func rewrite(_ token: TokenSyntax) -> TokenSyntax {
         precondition(token.tokenKind == .identifier("XCTest"))

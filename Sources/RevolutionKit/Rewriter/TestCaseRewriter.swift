@@ -2,9 +2,11 @@ import Foundation
 import SwiftSyntax
 
 class TestCaseRewriter: SyntaxRewriter {
-    private let rules: [any RewriteRule.Type] = [
-        ImportStatementRule.self,
-    ]
+    private let rules: RuleSets
+    
+    init(rules: [any RewriteRule.Type]) {
+        self.rules = rules
+    }
     
     override func visit(_ token: TokenSyntax) -> TokenSyntax {
         let newToken = rules.reduce(token) { token, rule in
