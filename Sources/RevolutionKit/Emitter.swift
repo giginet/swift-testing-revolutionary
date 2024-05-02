@@ -11,6 +11,6 @@ struct StringEmitter: Emitter {
     typealias EmitType = String
     
     func emit(sourceFileSyntax: SourceFileSyntax) -> EmitType {
-        sourceFileSyntax.description
+        String(bytes: sourceFileSyntax.syntaxTextBytes, encoding: .utf8) ?? ""
     }
 }

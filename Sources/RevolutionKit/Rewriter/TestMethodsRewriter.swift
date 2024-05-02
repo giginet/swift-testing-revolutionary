@@ -61,18 +61,24 @@ final class TestMethodsRewriter: SyntaxRewriter {
         let effectSpecifiers: FunctionEffectSpecifiersSyntax?
         if shouldAddThrows {
             let emptyEffectSpecifiers = FunctionEffectSpecifiersSyntax()
-            effectSpecifiers = emptyEffectSpecifiers.with(\.throwsSpecifier, .keyword(.throws))
+            effectSpecifiers = emptyEffectSpecifiers
+                .with(
+                    \.throwsSpecifier, .keyword(.throws)
+                )
+                .with(\.trailingTrivia, .space)
         } else {
             effectSpecifiers = node.signature.effectSpecifiers
         }
         
+        print(node.attributes)
         let initializerDecl = InitializerDeclSyntax(
             leadingTrivia: node.leadingTrivia,
             attributes: node.attributes,
             modifiers: node.modifiers,
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
-                    parameters: FunctionParameterListSyntax()
+                    parameters: FunctionParameterListSyntax(),
+                    trailingTrivia: .space
                 ),
                 effectSpecifiers: effectSpecifiers
             ),
