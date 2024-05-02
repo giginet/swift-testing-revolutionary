@@ -16,15 +16,11 @@ struct StringEmitter: Emitter {
     }
 }
 
-private let defaultRuleSets = [
-    ImportStatementRule.self,
-]
-
 package struct Runner {
-    private let rewriter: TestSourceFileRewriter
+    private let rewriter: SyntaxRewriter
     
-    init(rules: RuleSets = defaultRuleSets) {
-        rewriter = .init(rules: rules)
+    init(rewriter: SyntaxRewriter = TestSourceFileRewriter()) {
+        self.rewriter = rewriter
     }
     
     func run<E: Emitter>(for source: String, emitter: E) -> E.EmitType {
