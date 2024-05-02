@@ -4,6 +4,7 @@ import Testing
 
 private let fixtures: [ConversionTestFixtures] = [
     .init(source: "import XCTest", expected: "import Testing"),
+    .init(source: "import Foundation", expected: "import Foundation"),
 ]
 
 private struct ImportStatementRewriterTests {

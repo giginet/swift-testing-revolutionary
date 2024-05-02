@@ -4,6 +4,7 @@ import SwiftSyntax
 /// Rewriter to rewrite test XCTestCase class into swift-testing struct
 final class TestClassRewriter: SyntaxRewriter {
     private let globalOptions: GlobalOptions
+    private lazy var testCaseRewriter: TestMethodsRewriter = .init(globalOptions: globalOptions)
     
     init(globalOptions: GlobalOptions) {
         self.globalOptions = globalOptions

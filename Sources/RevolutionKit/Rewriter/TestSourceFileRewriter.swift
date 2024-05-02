@@ -19,10 +19,6 @@ class TestSourceFileRewriter: SyntaxRewriter {
         testClassRewriter.visit(node)
     }
     
-    override func visit(_ node: FunctionDeclSyntax) -> DeclSyntax {
-        super.visit(node)
-    }
-    
     override func visit(_ node: TryExprSyntax) -> ExprSyntax {
         super.visit(node)
     }
