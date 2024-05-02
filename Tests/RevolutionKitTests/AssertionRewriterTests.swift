@@ -10,7 +10,15 @@ private let fixtures: [ConversionTestFixture] = [
         """
         #expect(isValid)
         """
-    )
+    ),
+    .init(
+        """
+        XCTAssertTrue(isValid)
+        """,
+        """
+        #expect(isValid)
+        """
+    ),
 ]
 
 struct AssertionRewriterTests {

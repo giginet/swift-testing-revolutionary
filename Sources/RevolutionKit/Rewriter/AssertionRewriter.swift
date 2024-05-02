@@ -3,6 +3,7 @@ import SwiftSyntax
 
 private let xcTestAssertionConverters: [any AssertionConverter] = [
     XCTAssertConverter(),
+    XCTAssertTrueConverter(),
 ]
 
 
@@ -20,23 +21,9 @@ final class AssertionRewriter: SyntaxRewriter {
         }.first
         guard let converter else { return super.visit(node) }
         
-        guard let argument = converter.argument(from: node) else { return super.visit(node) }
+        guard let existentialExpr = converter.buildExpr(from: node) else { return super.visit(node) }
         
-        let macroExpansionExpr = buildExpectMacro(argument: argument)
-        
-        return ExprSyntax(macroExpansionExpr)
-    }
-    
-    private func buildExpectMacro(argument: LabeledExprSyntax) -> MacroExpansionExprSyntax {
-        var arguments = LabeledExprListSyntax()
-        arguments.append(argument)
-        
-        return MacroExpansionExprSyntax(
-            macroName: .identifier("expect"),
-            leftParen: .leftParenToken(),
-            arguments: arguments,
-            rightParen: .rightParenToken()
-        )
+        return ExprSyntax(existentialExpr)
     }
 }
 
