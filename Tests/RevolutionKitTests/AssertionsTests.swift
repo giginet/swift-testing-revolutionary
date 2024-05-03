@@ -160,6 +160,31 @@ private let fixtures: [ConversionTestFixture] = [
         #expect { try f() } throws: { error in _ }
         """
     ),
+    .init(
+        """
+        XCTAssert(isValid, "value should be true")
+        """,
+        """
+        #expect(isValid, "value should be true")
+        """
+    ),
+    .init(
+        """
+        XCTAssertTrue(isValid, "value should be true")
+        """,
+        """
+        #expect(isValid, "value should be true")
+        """
+    ),
+    .init(
+        """
+        XCTAssertFalse(isValid, "value should be false")
+        """,
+        """
+        #expect(!isValid, "value should be false")
+        """
+    ),
+    
 ]
 
 struct AssertionsTests {

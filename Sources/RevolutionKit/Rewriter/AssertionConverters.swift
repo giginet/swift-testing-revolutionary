@@ -47,7 +47,10 @@ struct XCTAssertConverter: ExpectConverter {
     let name = "XCTAssert"
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        return buildArguments([node.arguments.first].compactMap { $0 }, node: node)
+        let first = node.arguments.first
+        let remaining = node.arguments.dropFirst()
+        
+        return buildArguments([first].compactMap { $0 } + remaining, node: node)
     }
 }
 
@@ -55,7 +58,10 @@ struct XCTAssertTrueConverter: ExpectConverter {
     let name = "XCTAssertTrue"
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        return buildArguments([node.arguments.first].compactMap { $0 }, node: node)
+        let first = node.arguments.first
+        let remaining = node.arguments.dropFirst()
+        
+        return buildArguments([first].compactMap { $0 } + remaining, node: node)
     }
 }
 
@@ -63,15 +69,18 @@ struct XCTAssertFalseConverter: ExpectConverter {
     let name = "XCTAssertFalse"
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        guard let argument = node.arguments.first else {
+        guard let firstArgument = node.arguments.first else {
             return nil
         }
         let inverted = PrefixOperatorExprSyntax(
             operator: .exclamationMarkToken(),
-            expression: argument.expression
+            expression: firstArgument.expression
         )
-        let newArgument = LabeledExprSyntax(expression: inverted)
-        return buildArguments([newArgument], node: node)
+        let newArgument = firstArgument
+            .with(\.expression, ExprSyntax(inverted))
+        let remaining = node.arguments.dropFirst()
+        
+        return buildArguments([newArgument].compactMap { $0 } + remaining, node: node)
     }
 }
 
