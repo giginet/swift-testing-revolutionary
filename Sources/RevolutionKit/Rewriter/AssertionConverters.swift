@@ -223,9 +223,11 @@ struct XCTFailConverter: AssertionConverter {
 
 // MARK: XCTAssertThrowsError / XCTAssertNoThrow
 
-struct XCTAssertNoThrowConverter: AssertionConverter {
-    let name = "XCTAssertNoThrow"
-    
+protocol ErrorAssertionConverter: MacroAssertionConverter {
+    func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax?
+}
+
+extension ErrorAssertionConverter {
     func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
         guard let arguments = arguments(from: node), let trailingClosure = trailingClosure(from: node) else {
             return nil
@@ -257,6 +259,40 @@ struct XCTAssertNoThrowConverter: AssertionConverter {
             statements: codeBlockItems
         )
     }
+}
+
+struct XCTAssertThrowsErrorConverter: ErrorAssertionConverter {
+    let name = "XCTAssertThrowsError"
+    let macroName = "expect"
+    
+    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
+        let anyErrorSyntax = TypeExprSyntax(type: SomeOrAnyTypeSyntax(
+            someOrAnySpecifier: .keyword(.any, trailingTrivia: .space),
+            constraint: IdentifierTypeSyntax(name: .identifier("Error"))
+        )) // any Error
+        
+        let anyErrorDotSelfExpr = MemberAccessExprSyntax(
+            base: TupleExprSyntax(
+                elements: LabeledExprListSyntax([
+                    LabeledExprSyntax(expression: anyErrorSyntax)
+                ])
+            ),
+            name: .keyword(.self)
+        ) // (any Error).self
+        
+        let newArgument = LabeledExprSyntax(
+            label: .identifier("throws"),
+            colon: .colonToken(trailingTrivia: .space),
+            expression: anyErrorDotSelfExpr
+        ) // throws: (any Error).self
+        
+        return buildArguments([newArgument], node: node)
+    }
+}
+
+struct XCTAssertNoThrowConverter: ErrorAssertionConverter {
+    let name = "XCTAssertNoThrow"
+    let macroName = "expect"
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
         let neverError = MemberAccessExprSyntax(

@@ -138,6 +138,14 @@ private let fixtures: [ConversionTestFixture] = [
     ),
     .init(
         """
+        XCTAssertThrowsError(try f())
+        """,
+        """
+        #expect(throws: (any Error).self) { try f() }
+        """
+    ),
+    .init(
+        """
         XCTAssertNoThrow(try f())
         """,
         """
