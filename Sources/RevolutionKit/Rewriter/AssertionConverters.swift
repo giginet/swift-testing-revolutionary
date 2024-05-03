@@ -42,6 +42,21 @@ struct XCTAssertTrueConverter: ExpectConverter {
     }
 }
 
+struct XCTAssertFalseConverter: ExpectConverter {
+    let name = "XCTAssertFalse"
+    
+    func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+        guard let argument = node.arguments.first else {
+            return nil
+        }
+        let inverted = PrefixOperatorExprSyntax(
+            operator: .exclamationMarkToken(),
+            expression: argument.expression
+        )
+        return LabeledExprSyntax(expression: inverted)
+    }
+}
+
 // MARK: BinaryOperatorExpectConverter
 
 /// Abstract assertion converter it converts the arguments to an infix operator

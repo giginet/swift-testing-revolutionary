@@ -21,10 +21,31 @@ private let fixtures: [ConversionTestFixture] = [
     ),
     .init(
         """
+        XCTAssertFalse(isValid)
+        """,
+        """
+        #expect(!isValid)
+        """
+    ),
+    .init(
+        """
         XCTAssertEqual(1 + 1, 2)
         """,
         """
         #expect(1 + 1 == 2)
+        """
+    ),
+    .init(
+        """
+        XCTAssertEqual(
+            1 + 1,
+            2
+        )
+        """,
+        """
+        #expect(
+            1 + 1 == 
+            2)
         """
     ),
     .init(
