@@ -2,49 +2,46 @@ import Foundation
 import Testing
 @testable import RevolutionKit
 
+private let fixtureLoader = FixtureLoader()
+
 struct RunnerTests {
     private let runner = Runner()
-
-    @Test
-    func replaceImportStatement() {
-        let source = """
-import Foundation
-@testable import MyApp
-import XCTest
-
-final class APIClientTests: XCTestCase {
-    func testFetchProducts() async throws {
-        let client = APIClient(baseURL: stagingBaseURL)
-        let product = try await client.fetch(id: 100)
-        XCTAssertEqual(
-            product.name,
-            "Nice Cream"
-        )
-        XCTAssertTrue(product.isAvailable)
-        XCTAssertGreaterThan(product.price, 100)
-        XCTAssertNotNil(product.flavor)
-    }
-}
-"""
+    
+    @Test("Runner can convert all fixtures", arguments: try! fixtureLoader.loadFixtures())
+    func replaceAllFixtures(fixture: ConversionTestFixture) {
+        let source = fixture.source
         let converted = runner.run(for: source, emitter: StringEmitter())
-        let expected = """
-import Foundation
-@testable import MyApp
-import Testing
-
-struct APIClientTests {
-    @Test func fetchProducts() async throws {
-        let client = APIClient(baseURL: stagingBaseURL)
-        let product = try await client.fetch(id: 100)
-        #expect(
-            product.name == "Nice Cream"
-        )
-        #expect(product.isAvailable)
-        #expect(product.price > 100)
-        #expect(product.flavor != nil)
+        #expect(converted == fixture.expected)
     }
 }
-"""
-        #expect(converted == expected)
+
+private struct FixtureLoader {
+    private let fileManager: FileManager = .default
+    private let fixtureDir = URL(filePath: #filePath)
+        .deletingLastPathComponent()
+        .appending(component: "Fixtures")
+    private var inputDir: URL { fixtureDir.appending(component: "Inputs") }
+    private var expectsDir: URL { fixtureDir.appending(component: "Expects") }
+    
+    func loadFixtures() throws -> [ConversionTestFixture] {
+        let inputFiles = try fileManager.contentsOfDirectory(atPath: inputDir.path())
+        return inputFiles.map { fileName -> ConversionTestFixture? in
+            let inputFilePath = inputDir.appending(component: fileName)
+            let expectsFilePath = expectsDir.appending(component: fileName)
+            
+            guard let inputFileData = fileManager.contents(atPath: inputFilePath.path()),
+                  let expectFileData = fileManager.contents(atPath: expectsFilePath.path()),
+                  let inputFileString = String(data: inputFileData, encoding: .utf8),
+                  let expectFileString = String(data: expectFileData, encoding: .utf8)
+            else {
+                return nil
+            }
+            
+            return ConversionTestFixture(
+                inputFileString,
+                expectFileString
+            )
+        }
+        .compactMap { $0 }
     }
 }

@@ -1,0 +1,17 @@
+import Foundation
+@testable import MyApp
+import XCTest
+
+final class APIClientTests: XCTestCase {
+    func testFetchProducts() async throws {
+        let client = APIClient(baseURL: stagingBaseURL)
+        let product = try await client.fetch(id: 100)
+        XCTAssertEqual(
+            product.name,
+            "Nice Cream"
+        )
+        XCTAssertTrue(product.isAvailable)
+        XCTAssertGreaterThan(product.price, 100)
+        XCTAssertNotNil(product.flavor)
+    }
+}
