@@ -115,6 +115,14 @@ private let fixtures: [ConversionTestFixture] = [
         try #require(value)
         """
     ),
+    .init(
+        """
+        XCTFail("error")
+        """,
+        """
+        Issue.record("error")
+        """
+    ),
 ]
 
 struct AssertionRewriterTests {

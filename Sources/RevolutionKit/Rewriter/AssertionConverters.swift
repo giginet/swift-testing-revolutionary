@@ -181,3 +181,31 @@ struct XCTUnwrapConverter: RequireConverter {
         return node.arguments.first
     }
 }
+
+// MARK: XCTFail
+
+struct XCTFailConverter: AssertionConverter {
+    let name = "XCTFail"
+    
+    func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
+        guard let argument = argument(from: node) else {
+            return nil
+        }
+        var arguments = LabeledExprListSyntax()
+        arguments.append(argument)
+        
+        return FunctionCallExprSyntax(
+            calledExpression: MemberAccessExprSyntax(
+                base: DeclReferenceExprSyntax(baseName: .identifier("Issue")),
+                name: .identifier("record")
+            ),
+            leftParen: .leftParenToken(),
+            arguments: arguments,
+            rightParen: .rightParenToken()
+        )
+    }
+    
+    func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+        return node.arguments.first
+    }
+}
