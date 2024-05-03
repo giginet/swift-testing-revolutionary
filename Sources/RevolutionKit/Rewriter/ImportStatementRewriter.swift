@@ -3,12 +3,17 @@ import SwiftSyntax
 
 /// Rewriter to replace `XCTest` imports with `Testing`.
 final class ImportStatementRewriter: SyntaxRewriter {
-    override func visit(_ token: TokenSyntax) -> TokenSyntax {
-        guard token.tokenKind == .identifier("XCTest") &&
-                token.previousToken(viewMode: .sourceAccurate)?.tokenKind == .keyword(.import) else {
-            return token
+    override func visit(_ node: ImportDeclSyntax) -> DeclSyntax {
+        guard let importPathComponent = node.traverse(kinds: [.importPathComponentList, .importPathComponent], as: ImportPathComponentSyntax.self) else {
+            return super.visit(node)
         }
         
-        return token.with(\.tokenKind, .identifier("Testing"))
+        let newNode = ImportDeclSyntax(
+            path: ImportPathComponentListSyntax([
+                importPathComponent.with(\.name, .identifier("Testing"))
+            ])
+        )
+        
+        return super.visit(DeclSyntax(newNode))
     }
 }
