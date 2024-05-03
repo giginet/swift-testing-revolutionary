@@ -2,14 +2,8 @@ import Foundation
 import SwiftSyntax
 
 /// Rewriter to rewrite XCTest's test methods to swift-testing.
-final class TestMethodsRewriter: SyntaxRewriter {
-    let globalOptions: GlobalOptions
-    
-    init(globalOptions: GlobalOptions) {
-        self.globalOptions = globalOptions
-    }
-    
-    override func visit(_ node: FunctionDeclSyntax) -> DeclSyntax {
+extension TestSourceFileRewriter {
+    func visitForTestFunctionDecl(_ node: FunctionDeclSyntax) -> DeclSyntax {
         guard let methodKind = detectMethodKind(of: node) else {
             return DeclSyntax(node)
         }
@@ -35,6 +29,7 @@ final class TestMethodsRewriter: SyntaxRewriter {
         }
         
         let testMacroAttribute = AttributeSyntax(
+            leadingTrivia: node.leadingTrivia,
             attributeName: IdentifierTypeSyntax(
                 name: .identifier("Test"),
                 trailingTrivia: .space
@@ -152,7 +147,7 @@ final class TestMethodsRewriter: SyntaxRewriter {
     }
 }
 
-extension TestMethodsRewriter {
+extension TestSourceFileRewriter {
     fileprivate enum MethodKind {
         case testCase(String)
         case setUp

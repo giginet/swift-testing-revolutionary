@@ -137,7 +137,7 @@ struct TestMethodsRewriterTests {
     
     @Test("TestMethodsRewriter can convert test cases", arguments: testCaseConversionFixtures)
     private func rewriteTestCases(_ fixture: ConversionTestFixture) throws {
-        let runner = Runner(rewriter: TestMethodsRewriter(globalOptions: .default))
+        let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
@@ -145,7 +145,7 @@ struct TestMethodsRewriterTests {
     
     @Test("TestMethodsRewriter can convert setUp methods", arguments: setUpConversionFixtures)
     private func rewriteSetUps(_ fixture: ConversionTestFixture) throws {
-        let runner = Runner(rewriter: TestMethodsRewriter(globalOptions: .default))
+        let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
@@ -153,7 +153,7 @@ struct TestMethodsRewriterTests {
     
     @Test("TestMethodsRewriter can convert tearDown methods", arguments: tearDownConversionFixtures)
     private func rewriteTearDowns(_ fixture: ConversionTestFixture) throws {
-        let runner = Runner(rewriter: TestMethodsRewriter(globalOptions: .default))
+        let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
