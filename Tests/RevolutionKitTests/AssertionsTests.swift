@@ -152,6 +152,14 @@ private let fixtures: [ConversionTestFixture] = [
         #expect(throws: Never.self) { try f() }
         """
     ),
+    .init(
+        """
+        XCTAssertThrowsError(try f()) { error in _ }
+        """,
+        """
+        #expect { try f() } throws: { error in _ }
+        """
+    ),
 ]
 
 struct AssertionsTests {
