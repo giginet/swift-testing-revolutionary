@@ -123,6 +123,14 @@ private let fixtures: [ConversionTestFixture] = [
         Issue.record("error")
         """
     ),
+    .init(
+        """
+        XCTAssertNoThrow(try f())
+        """,
+        """
+        #expect(throws: Never.self) { try f() }
+        """
+    ),
 ]
 
 struct AssertionRewriterTests {

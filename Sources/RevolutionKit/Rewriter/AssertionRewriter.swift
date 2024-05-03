@@ -17,8 +17,8 @@ private let xcTestAssertionConverters: [any AssertionConverter] = [
     XCTAssertNotNilConverter(),
     XCTUnwrapConverter(),
     XCTFailConverter(),
+    XCTAssertNoThrowConverter(),
 ]
-
 
 /// Rewriter to replace XCTest assertions to swift-testing.
 final class AssertionRewriter: SyntaxRewriter {

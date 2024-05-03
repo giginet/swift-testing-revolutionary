@@ -209,3 +209,57 @@ struct XCTFailConverter: AssertionConverter {
         return node.arguments.first
     }
 }
+
+// MARK: XCTAssertThrowsError / XCTAssertNoThrow
+
+struct XCTAssertNoThrowConverter: AssertionConverter {
+    let name = "XCTAssertNoThrow"
+    
+    func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
+        guard let argument = argument(from: node), let trailingClosure = trailingClosure(from: node) else {
+            return nil
+        }
+        
+        let arguments = LabeledExprListSyntax([
+            argument
+        ])
+        
+        return MacroExpansionExprSyntax(
+            macroName: .identifier("expect"),
+            leftParen: .leftParenToken(),
+            arguments: arguments,
+            rightParen: .rightParenToken(),
+            trailingClosure: trailingClosure
+        )
+    }
+    
+    func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
+        guard let closureCall = node.arguments.first else {
+            return nil
+        }
+        
+        let codeBlockItems = CodeBlockItemListSyntax([
+            CodeBlockItemSyntax(
+                leadingTrivia: .space,
+                item: .expr(closureCall.expression),
+                trailingTrivia: .space
+            )
+        ])
+        return ClosureExprSyntax(
+            leadingTrivia: .space,
+            statements: codeBlockItems
+        )
+    }
+    
+    func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+        let neverError = MemberAccessExprSyntax(
+            base: DeclReferenceExprSyntax(baseName: .identifier("Never")),
+            name: .keyword(.self)
+        )
+        return LabeledExprSyntax(
+            label: .identifier("throws"),
+            colon: .colonToken(trailingTrivia: .space),
+            expression: neverError
+        )
+    }
+}
