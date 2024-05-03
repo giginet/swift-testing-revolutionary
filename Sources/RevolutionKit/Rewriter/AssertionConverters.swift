@@ -7,9 +7,11 @@ protocol AssertionConverter {
     func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax?
 }
 
-protocol ExpectConverter: AssertionConverter { }
+protocol MacroAssertionConverter: AssertionConverter {
+    var macroName: String { get }
+}
 
-extension ExpectConverter {
+extension MacroAssertionConverter {
     func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
         guard let argument = argument(from: node) else {
             return nil
@@ -18,12 +20,18 @@ extension ExpectConverter {
         arguments.append(argument)
         
         return MacroExpansionExprSyntax(
-            macroName: .identifier("expect"),
+            macroName: .identifier(macroName),
             leftParen: .leftParenToken(),
             arguments: arguments,
             rightParen: .rightParenToken()
         )
     }
+}
+
+protocol ExpectConverter: MacroAssertionConverter { }
+
+extension ExpectConverter {
+    var macroName: String { "expect" }
 }
 
 struct XCTAssertConverter: ExpectConverter {
@@ -154,5 +162,22 @@ struct XCTAssertNotNilConverter: InfixOperatorExpectConverter {
     
     func rhs(from node: FunctionCallExprSyntax) -> RHS? {
         NilLiteralExprSyntax()
+    }
+}
+
+// MARK: RequireConverter
+
+protocol RequireConverter: MacroAssertionConverter {
+}
+
+extension RequireConverter {
+    var macroName: String { "require" }
+}
+
+struct XCTUnwrapConverter: RequireConverter {
+    let name = "XCTUnwrap"
+    
+    func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+        return node.arguments.first
     }
 }

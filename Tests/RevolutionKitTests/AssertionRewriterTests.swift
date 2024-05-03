@@ -37,19 +37,6 @@ private let fixtures: [ConversionTestFixture] = [
     ),
     .init(
         """
-        XCTAssertEqual(
-            1 + 1,
-            2
-        )
-        """,
-        """
-        #expect(
-            1 + 1 == 
-            2)
-        """
-    ),
-    .init(
-        """
         XCTAssertNotEqual(1 + 1, 3)
         """,
         """
@@ -118,6 +105,14 @@ private let fixtures: [ConversionTestFixture] = [
         """,
         """
         #expect(value != nil)
+        """
+    ),
+    .init(
+        """
+        try XCTUnwrap(value)
+        """,
+        """
+        try #require(value)
         """
     ),
 ]

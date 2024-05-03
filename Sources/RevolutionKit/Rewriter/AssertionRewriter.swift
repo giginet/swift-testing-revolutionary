@@ -15,6 +15,7 @@ private let xcTestAssertionConverters: [any AssertionConverter] = [
     XCTAssertLessThanConverter(),
     XCTAssertNilConverter(),
     XCTAssertNotNilConverter(),
+    XCTUnwrapConverter(),
 ]
 
 
