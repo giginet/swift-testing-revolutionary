@@ -2,18 +2,22 @@ import Foundation
 import SwiftSyntax
 
 /// Rewriter to replace `XCTest` imports with `Testing`.
-final class ImportStatementRewriter: SyntaxRewriter {
-    override func visit(_ node: ImportDeclSyntax) -> DeclSyntax {
-        guard let importPathComponent = node.traverse(kinds: [.importPathComponentList, .importPathComponent], as: ImportPathComponentSyntax.self) else {
+extension TestSourceFileRewriter {
+    func visitForImportDecl(_ node: ImportDeclSyntax) -> DeclSyntax {
+        guard let importPathComponent = node.traverse(kinds: [.importPathComponentList, .importPathComponent], as: ImportPathComponentSyntax.self),
+              importPathComponent.name.tokenKind == .identifier("XCTest")
+        else {
             return super.visit(node)
         }
         
-        let newNode = ImportDeclSyntax(
-            path: ImportPathComponentListSyntax([
-                importPathComponent.with(\.name, .identifier("Testing"))
-            ])
-        )
+        let newPath = ImportPathComponentListSyntax([
+            importPathComponent
+                .with(\.name, .identifier("Testing"))
+                .with(\.leadingTrivia, .space)
+        ])
         
-        return super.visit(DeclSyntax(newNode))
+        let newNode = node.with(\.path, newPath)
+        
+        return super.visit(newNode)
     }
 }
