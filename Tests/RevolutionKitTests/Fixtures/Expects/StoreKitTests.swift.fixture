@@ -50,10 +50,12 @@ struct StoreTests {
         #expect(productionStore.isPremiumPlan)
         
         do {
-            let _ = try await productionStore.purchase()Issue.record("Error should be raised")
+            let _ = try await productionStore.purchase()
+            Issue.record("Error should be raised")
         } catch let purchaseError as ProductionStore.PurchaseError {
             #expect(purchaseError == .nonRenewableProductAlreadyPurchased)
-        } catch {Issue.record("Unknown error is raised")
+        } catch {
+            Issue.record("Unknown error is raised")
         }
     }
 }

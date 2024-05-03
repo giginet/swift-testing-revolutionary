@@ -201,19 +201,15 @@ struct XCTFailConverter: AssertionConverter {
     let name = "XCTFail"
     
     func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
-        guard let arguments = arguments(from: node) else {
-            return nil
-        }
+        let newCallExpr = MemberAccessExprSyntax(
+            leadingTrivia: node.calledExpression.leadingTrivia,
+            base: DeclReferenceExprSyntax(baseName: .identifier("Issue")),
+            name: .identifier("record"),
+            trailingTrivia: node.calledExpression.trailingTrivia
+        ) // Issue.record
         
-        return FunctionCallExprSyntax(
-            calledExpression: MemberAccessExprSyntax(
-                base: DeclReferenceExprSyntax(baseName: .identifier("Issue")),
-                name: .identifier("record")
-            ),
-            leftParen: .leftParenToken(),
-            arguments: arguments,
-            rightParen: .rightParenToken()
-        )
+        return node
+            .with(\.calledExpression, ExprSyntax(newCallExpr))
     }
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
