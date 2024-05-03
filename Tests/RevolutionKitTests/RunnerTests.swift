@@ -33,13 +33,12 @@ import Foundation
 import Testing
 
 struct APIClientTests {
-    @Test
-    func fetchProducts() async throws {
+    @Test func fetchProducts() async throws {
         let client = APIClient(baseURL: stagingBaseURL)
         let product = try await client.fetch(id: 100)
         #expect(
-            product.name == 
-            "Nice Cream")
+            product.name == "Nice Cream"
+        )
         #expect(product.isAvailable)
         #expect(product.price > 100)
         #expect(product.flavor != nil)

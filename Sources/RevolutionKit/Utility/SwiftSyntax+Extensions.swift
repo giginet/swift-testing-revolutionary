@@ -40,3 +40,12 @@ extension SyntaxProtocol {
         return abstractSyntax?.as(ReturnType.self)
     }
 }
+
+extension SyntaxCollection {
+    mutating func removeAll() {
+        let count = count
+        for _ in 0..<count {
+            remove(at: startIndex)
+        }
+    }
+}

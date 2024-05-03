@@ -5,6 +5,19 @@ import Testing
 private let fixtures: [ConversionTestFixture] = [
     .init(
         """
+        XCTAssertEqual(
+            1 + 1,
+            2
+        )
+        """,
+        """
+        #expect(
+            1 + 1 == 2
+        )
+        """
+    ),
+    .init(
+        """
         XCTAssert(isValid)
         """,
         """
@@ -141,6 +154,6 @@ struct AssertionRewriterTests {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
+        #expect(result == fixture.expected)
     }
 }

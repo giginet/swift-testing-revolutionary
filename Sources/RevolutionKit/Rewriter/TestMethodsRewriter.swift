@@ -44,6 +44,7 @@ extension TestSourceFileRewriter {
         }()
         
         let newSigniture = node
+            .with(\.leadingTrivia, .spaces(0))
             .with(\.attributes, attributes)
             .with(\.name, .identifier(newTestCaseName))
         
@@ -85,8 +86,7 @@ extension TestSourceFileRewriter {
             leadingTrivia: node.leadingTrivia,
             attributes: node.attributes,
             modifiers: node.modifiers,
-            body: node.body?.with(\.leadingTrivia, .space),
-            trailingTrivia: node.trailingTrivia
+            body: node.body?.with(\.leadingTrivia, .space)
         )
         
         return DeclSyntax(deinitializerDecl)
