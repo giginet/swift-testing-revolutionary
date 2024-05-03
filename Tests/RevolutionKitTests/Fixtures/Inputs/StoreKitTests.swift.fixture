@@ -1,0 +1,59 @@
+import Foundation
+import XCTest
+import StoreKitTest
+@testable import MyApp
+
+final class StoreTests: XCTestCase {
+    private var testSession: SKTestSession!
+    private let productionStore = ProductionStore()
+    
+    override func setUpWithError() throws {
+        testSession = try SKTestSession(configurationFileNamed: "PremiumPlan")
+        
+        testSession.disableDialogs = true
+        testSession.clearTransactions()
+        
+        try super.setUpWithError()
+    }
+    
+    func testCanPurchaseSubscription() async throws {
+        try await productionStore.initialize()
+        XCTAssertFalse(productionStore.isPremiumPlan)
+        
+        let _ = try await productionStore.purchase()
+        XCTAssertTrue(productionStore.isPremiumPlan)
+    }
+    
+    func testEnabledPremiumPlanIfNonRenewableIsAlreadyPurchased() async throws {
+        try await testSession.buyProduct(
+            identifier: "premium_plan"
+        )
+        try await productionStore.initialize()
+        XCTAssertTrue(productionStore.isPremiumPlan)
+    }
+    
+    func testEnabledPremiumPlanIfSubscriptionIsAlreadyPurchased() async throws {
+        try await testSession.buyProduct(
+            identifier: "org.giginet.MyApp.premium_plan_annual"
+        )
+        try await productionStore.initialize()
+        XCTAssertTrue(productionStore.isPremiumPlan)
+    }
+    
+    func testCannotPurchaseSubscriptionAlreadyPurchasedNonRenewable() async throws {
+        try await testSession.buyProduct(
+            identifier: "premium_plan"
+        )
+        try await productionStore.initialize()
+        XCTAssertTrue(productionStore.isPremiumPlan)
+        
+        do {
+            let _ = try await productionStore.purchase()
+            XCTFail("Error should be raised")
+        } catch let purchaseError as ProductionStore.PurchaseError {
+            XCTAssertEqual(purchaseError, .nonRenewableProductAlreadyPurchased)
+        } catch {
+            XCTFail("Unknown error is raised")
+        }
+    }
+}

@@ -1,0 +1,59 @@
+import Foundation
+import Testing
+import StoreKitTest
+@testable import MyApp
+
+struct StoreTests {
+    private var testSession: SKTestSession!
+    private let productionStore = ProductionStore()
+    
+    
+    
+    override init() throws {
+        testSession = try SKTestSession(configurationFileNamed: "PremiumPlan")
+        
+        testSession.disableDialogs = true
+        testSession.clearTransactions()
+        
+        try super.setUpWithError()
+    }
+    
+    @Test func canPurchaseSubscription() async throws {
+        try await productionStore.initialize()
+        #expect(!productionStore.isPremiumPlan)
+        
+        let _ = try await productionStore.purchase()
+        #expect(productionStore.isPremiumPlan)
+    }
+    
+    @Test func enabledPremiumPlanIfNonRenewableIsAlreadyPurchased() async throws {
+        try await testSession.buyProduct(
+            identifier: "premium_plan"
+        )
+        try await productionStore.initialize()
+        #expect(productionStore.isPremiumPlan)
+    }
+    
+    @Test func enabledPremiumPlanIfSubscriptionIsAlreadyPurchased() async throws {
+        try await testSession.buyProduct(
+            identifier: "org.giginet.MyApp.premium_plan_annual"
+        )
+        try await productionStore.initialize()
+        #expect(productionStore.isPremiumPlan)
+    }
+    
+    @Test func cannotPurchaseSubscriptionAlreadyPurchasedNonRenewable() async throws {
+        try await testSession.buyProduct(
+            identifier: "premium_plan"
+        )
+        try await productionStore.initialize()
+        #expect(productionStore.isPremiumPlan)
+        
+        do {
+            let _ = try await productionStore.purchase()Issue.record("Error should be raised")
+        } catch let purchaseError as ProductionStore.PurchaseError {
+            #expect(purchaseError == .nonRenewableProductAlreadyPurchased)
+        } catch {Issue.record("Unknown error is raised")
+        }
+    }
+}
