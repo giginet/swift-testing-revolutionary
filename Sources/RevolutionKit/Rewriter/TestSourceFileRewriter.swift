@@ -3,8 +3,7 @@ import SwiftSyntax
 
 /// Rewriter for the whole test file. It expects to be used for SourceFileSyntax
 class TestSourceFileRewriter: SyntaxRewriter {
-    private let globalOptions: GlobalOptions
-    private lazy var testClassRewriter = TestClassRewriter(globalOptions: globalOptions)
+    let globalOptions: GlobalOptions
     private lazy var assertionRewriter = AssertionRewriter(globalOptions: globalOptions)
     
     init(globalOptions: GlobalOptions) {
@@ -15,9 +14,9 @@ class TestSourceFileRewriter: SyntaxRewriter {
         visitForImportDecl(node)
     }
     
-//    override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
-//        testClassRewriter.visit(node)
-//    }
+    override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
+        visitForTestClass(node)
+    }
 //    
 //    override func visit(_ node: TryExprSyntax) -> ExprSyntax {
 //        super.visit(node)

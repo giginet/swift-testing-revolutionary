@@ -2,15 +2,8 @@ import Foundation
 import SwiftSyntax
 
 /// Rewriter to rewrite test XCTestCase class into swift-testing struct
-final class TestClassRewriter: SyntaxRewriter {
-    private let globalOptions: GlobalOptions
-    private lazy var testCaseRewriter: TestMethodsRewriter = .init(globalOptions: globalOptions)
-    
-    init(globalOptions: GlobalOptions) {
-        self.globalOptions = globalOptions
-    }
-    
-    override func visit(_ node: ClassDeclSyntax) -> DeclSyntax {
+extension TestSourceFileRewriter {
+    func visitForTestClass(_ node: ClassDeclSyntax) -> DeclSyntax {
         guard guessWhetherTestCaseClass(node) else {
             return super.visit(node)
         }
@@ -30,7 +23,7 @@ final class TestClassRewriter: SyntaxRewriter {
                 inheritedTypes: [],
                 trailingTrivia: .spaces(1))
             )
-        return DeclSyntax(newNode)
+        return super.visit(newNode)
     }
     
     /// Build struct decl from ClassDeclSyntax
@@ -38,14 +31,14 @@ final class TestClassRewriter: SyntaxRewriter {
     private func buildStruct(from node: ClassDeclSyntax) -> DeclSyntax {
         // We can't convert ClassDecl to StructDecl, so we just replace some parameters instead.
         let newNode = node
-            .with(\.classKeyword, .keyword(.struct, trailingTrivia: .spaces(1)))
+            .with(\.classKeyword, .keyword(.struct, leadingTrivia: node.leadingTrivia, trailingTrivia: .spaces(1)))
             .with(\.modifiers, []) // get rid of 'final' keyword
             .with(\.inheritanceClause, InheritanceClauseSyntax(
                 colon: .unknown(""),
                 inheritedTypes: [],
                 trailingTrivia: .spaces(1))
             )
-        return DeclSyntax(newNode)
+        return super.visit(newNode)
     }
     
     private var shouldConvertToStruct: Bool {
