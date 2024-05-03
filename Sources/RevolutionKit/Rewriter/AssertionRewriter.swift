@@ -4,6 +4,7 @@ import SwiftSyntax
 private let xcTestAssertionConverters: [any AssertionConverter] = [
     XCTAssertConverter(),
     XCTAssertTrueConverter(),
+    XCTAssertEqualConverter(),
 ]
 
 

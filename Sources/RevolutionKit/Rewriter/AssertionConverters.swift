@@ -41,3 +41,48 @@ struct XCTAssertTrueConverter: ExpectConverter {
         return node.arguments.first
     }
 }
+
+// MARK: BinaryOperatorExpectConverter
+
+/// Abstract assertion converter it converts the arguments to an infix operator
+protocol InfixOperatorExpectConverter: ExpectConverter {
+    associatedtype LHS: ExprSyntaxProtocol
+    associatedtype RHS: ExprSyntaxProtocol
+    
+    var binaryOperator: String { get }
+    
+    func lhs(from node: FunctionCallExprSyntax) -> LHS
+    func rhs(from node: FunctionCallExprSyntax) -> RHS
+}
+
+extension InfixOperatorExpectConverter {
+    func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+        guard node.arguments.count >= 2 else {
+            return nil
+        }
+        
+        let infixOperatorSyntax = InfixOperatorExprSyntax(
+            leftOperand: lhs(from: node),
+            operator: BinaryOperatorExprSyntax(
+                leadingTrivia: .space,
+                operator: .binaryOperator(binaryOperator),
+                trailingTrivia: .space
+            ),
+            rightOperand: rhs(from: node)
+        )
+        return LabeledExprSyntax(expression: infixOperatorSyntax)
+    }
+    
+    func lhs(from node: FunctionCallExprSyntax) -> some ExprSyntaxProtocol {
+        return node.arguments[node.arguments.startIndex].expression
+    }
+    
+    func rhs(from node: FunctionCallExprSyntax) -> some ExprSyntaxProtocol {
+        return node.arguments[node.arguments.index(at: 1)].expression
+    }
+}
+
+struct XCTAssertEqualConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertEqual"
+    let binaryOperator = "=="
+}

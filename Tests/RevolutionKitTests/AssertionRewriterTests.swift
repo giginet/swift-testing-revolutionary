@@ -19,6 +19,14 @@ private let fixtures: [ConversionTestFixture] = [
         #expect(isValid)
         """
     ),
+    .init(
+        """
+        XCTAssertEqual(1 + 1, 2)
+        """,
+        """
+        #expect(1 + 1 == 2)
+        """
+    ),
 ]
 
 struct AssertionRewriterTests {
