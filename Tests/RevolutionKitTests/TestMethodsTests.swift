@@ -101,6 +101,16 @@ private let setUpConversionFixtures: [ConversionTestFixture] = [
     ),
     .init(
         """
+        override func setUp() {
+        }
+        """,
+        """
+        init() {
+        }
+        """
+    ),
+    .init(
+        """
         static func setUp() {
         }
         """,
@@ -125,6 +135,16 @@ private let tearDownConversionFixtures: [ConversionTestFixture] = [
     .init(
         """
         func tearDown() async throws {
+        }
+        """,
+        """
+        deinit {
+        }
+        """
+    ),
+    .init(
+        """
+        override func tearDown() async throws {
         }
         """,
         """

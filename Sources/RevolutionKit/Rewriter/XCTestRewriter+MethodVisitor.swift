@@ -60,7 +60,7 @@ extension XCTestRewriter {
         let initializerDecl = InitializerDeclSyntax(
             leadingTrivia: node.leadingTrivia,
             attributes: node.attributes,
-            modifiers: node.modifiers,
+            modifiers: removeInvalidModifiers(from: node.modifiers),
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
                     parameters: FunctionParameterListSyntax(),
@@ -68,8 +68,7 @@ extension XCTestRewriter {
                 ),
                 effectSpecifiers: effectSpecifiers
             ),
-            body: node.body,
-            trailingTrivia: node.trailingTrivia
+            body: node.body
         )
         
         return DeclSyntax(initializerDecl)
@@ -85,7 +84,7 @@ extension XCTestRewriter {
         let deinitializerDecl = DeinitializerDeclSyntax(
             leadingTrivia: node.leadingTrivia,
             attributes: node.attributes,
-            modifiers: node.modifiers,
+            modifiers: removeInvalidModifiers(from: node.modifiers),
             body: node.body?.with(\.leadingTrivia, .space)
         )
         
@@ -132,6 +131,17 @@ extension XCTestRewriter {
         node.modifiers.contains {
             $0.tokens(viewMode: .sourceAccurate).contains { $0.tokenKind == .keyword(.static) }
         }
+    }
+    
+    /// Removes some invalid modifiers for initializer/deinitializer
+    /// This method trims `override` attribute
+    private func removeInvalidModifiers(from modifiers: DeclModifierListSyntax) -> DeclModifierListSyntax {
+        var newModifiers = modifiers
+        guard let index = modifiers.findIndex(where: { $0.name.tokenKind == .keyword(.override) }) else {
+            return modifiers
+        }
+        newModifiers.remove(at: index)
+        return newModifiers
     }
 }
 

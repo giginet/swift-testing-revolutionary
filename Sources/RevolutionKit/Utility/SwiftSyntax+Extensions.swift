@@ -48,4 +48,13 @@ extension SyntaxCollection {
             remove(at: startIndex)
         }
     }
+    
+    func findIndex(where condition: (Element) -> Bool) -> SyntaxChildrenIndex? {
+        for element in self {
+            if condition(element) {
+                return index(of: element)
+            }
+        }
+        return nil
+    }
 }
