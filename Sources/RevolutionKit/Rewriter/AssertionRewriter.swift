@@ -21,14 +21,8 @@ private let xcTestAssertionConverters: [any AssertionConverter] = [
 ]
 
 /// Rewriter to replace XCTest assertions to swift-testing.
-final class AssertionRewriter: SyntaxRewriter {
-    private let globalOptions: GlobalOptions
-    
-    init(globalOptions: GlobalOptions) {
-        self.globalOptions = globalOptions
-    }
-    
-    override func visit(_ node: FunctionCallExprSyntax) -> ExprSyntax {
+extension TestSourceFileRewriter {
+    func visitForTestFunctionCall(_ node: FunctionCallExprSyntax) -> ExprSyntax {
         let converter = node.calledExpression.tokens(viewMode: .sourceAccurate).compactMap { token in
             xcTestAssertionConverters.find(by: token.text)
         }.first
@@ -36,7 +30,7 @@ final class AssertionRewriter: SyntaxRewriter {
         
         guard let existentialExpr = converter.buildExpr(from: node) else { return super.visit(node) }
         
-        return ExprSyntax(existentialExpr)
+        return super.visit(ExprSyntax(existentialExpr))
     }
 }
 

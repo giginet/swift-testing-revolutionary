@@ -5,16 +5,16 @@ import SwiftSyntax
 extension TestSourceFileRewriter {
     func visitForTestFunctionDecl(_ node: FunctionDeclSyntax) -> DeclSyntax {
         guard let methodKind = detectMethodKind(of: node) else {
-            return DeclSyntax(node)
+            return super.visit(node)
         }
         
         switch methodKind {
         case .testCase:
-            return rewriteTestCase(node: node)
+            return super.visit(rewriteTestCase(node: node))
         case .setUp:
-            return rewriteSetUp(node: node)
+            return super.visit(rewriteSetUp(node: node))
         case .tearDown:
-            return rewriteTearDown(node: node)
+            return super.visit(rewriteTearDown(node: node))
         }
     }
     

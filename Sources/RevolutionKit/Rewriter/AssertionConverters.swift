@@ -20,10 +20,12 @@ extension MacroAssertionConverter {
         arguments.append(argument)
         
         return MacroExpansionExprSyntax(
+            leadingTrivia: node.leadingTrivia,
             macroName: .identifier(macroName),
             leftParen: .leftParenToken(),
             arguments: arguments,
-            rightParen: .rightParenToken()
+            rightParen: .rightParenToken(),
+            trailingTrivia: node.trailingTrivia
         )
     }
 }
