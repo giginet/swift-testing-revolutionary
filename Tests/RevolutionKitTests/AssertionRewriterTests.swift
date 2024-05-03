@@ -133,7 +133,6 @@ private let fixtures: [ConversionTestFixture] = [
     ),
 ]
 
-@Suite(.disabled(if: true))
 struct AssertionRewriterTests {
     private let emitter = StringEmitter()
     
@@ -142,6 +141,6 @@ struct AssertionRewriterTests {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected)
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
 }

@@ -88,7 +88,6 @@ private let classConversionFixtures: [ConversionTestFixture] = [
     ),
 ]
 
-@Suite(.disabled(if: true))
 struct TestClassRewriterTests {
     private let emitter = StringEmitter()
     
@@ -97,7 +96,7 @@ struct TestClassRewriterTests {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected)
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
     
     @Test("TestClassRewriter can convert test class definitions to classes", arguments: classConversionFixtures)
@@ -105,6 +104,6 @@ struct TestClassRewriterTests {
         let runner = Runner(globalOptions: .init(enableStructConversion: false))
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected)
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
 }

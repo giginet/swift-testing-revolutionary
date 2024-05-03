@@ -29,17 +29,18 @@ extension TestSourceFileRewriter {
         }
         
         let testMacroAttribute = AttributeSyntax(
-            leadingTrivia: node.leadingTrivia,
             attributeName: IdentifierTypeSyntax(
-                name: .identifier("Test"),
-                trailingTrivia: .space
-            )
+                name: .identifier("Test")
+            ),
+            trailingTrivia: .space
         )
         
         let attributes = {
             var attributes = node.attributes
             attributes.insert(.attribute(testMacroAttribute), at: attributes.startIndex)
             return attributes
+                .with(\.leadingTrivia, node.leadingTrivia)
+                .with(\.trailingTrivia, .space)
         }()
         
         let newSigniture = node
@@ -53,20 +54,7 @@ extension TestSourceFileRewriter {
     /// func setUp() -> init()
     /// func setUpWithError() -> init() throws
     private func rewriteSetUp(node: FunctionDeclSyntax) -> DeclSyntax {
-        let shouldAddThrows = node.name.text == "setUpWithError"
-        
-        // If the method was `setUpWithError`, add `throws` as a function effect specifier
-        let effectSpecifiers: FunctionEffectSpecifiersSyntax?
-        if shouldAddThrows {
-            let emptyEffectSpecifiers = FunctionEffectSpecifiersSyntax()
-            effectSpecifiers = emptyEffectSpecifiers
-                .with(
-                    \.throwsSpecifier, .keyword(.throws)
-                )
-                .with(\.trailingTrivia, .space)
-        } else {
-            effectSpecifiers = node.signature.effectSpecifiers
-        }
+        let effectSpecifiers = node.signature.effectSpecifiers
         
         let initializerDecl = InitializerDeclSyntax(
             leadingTrivia: node.leadingTrivia,

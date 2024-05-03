@@ -79,7 +79,7 @@ private let setUpConversionFixtures: [ConversionTestFixture] = [
     ),
     .init(
         """
-        func setUpWithError() {
+        func setUpWithError() throws {
         }
         """,
         """
@@ -140,7 +140,7 @@ struct TestMethodsRewriterTests {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected)
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
     
     @Test("TestMethodsRewriter can convert setUp methods", arguments: setUpConversionFixtures)
@@ -148,7 +148,7 @@ struct TestMethodsRewriterTests {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected)
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
     
     @Test("TestMethodsRewriter can convert tearDown methods", arguments: tearDownConversionFixtures)
@@ -156,6 +156,6 @@ struct TestMethodsRewriterTests {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())
-        #expect(result == fixture.expected)
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
 }

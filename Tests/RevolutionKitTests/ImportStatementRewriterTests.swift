@@ -7,7 +7,6 @@ private let fixtures: [ConversionTestFixture] = [
     .init("import Foundation", "import Foundation"),
 ]
 
-@Suite(.disabled(if: true))
 struct ImportStatementRewriterTests {
     private let emitter = StringEmitter()
     
