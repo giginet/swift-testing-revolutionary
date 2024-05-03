@@ -146,7 +146,7 @@ private let fixtures: [ConversionTestFixture] = [
     ),
 ]
 
-struct AssertionRewriterTests {
+struct AssertionsTests {
     private let emitter = StringEmitter()
     
     @Test("AssertionRewriter can rewrite all assertions", arguments: fixtures)

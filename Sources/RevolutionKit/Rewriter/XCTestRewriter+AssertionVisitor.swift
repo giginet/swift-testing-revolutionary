@@ -20,8 +20,8 @@ private let xcTestAssertionConverters: [any AssertionConverter] = [
     XCTAssertNoThrowConverter(),
 ]
 
-/// Rewriter to replace XCTest assertions to swift-testing.
-extension TestSourceFileRewriter {
+/// Visitor to replace XCTest assertions to swift-testing.
+extension XCTestRewriter {
     func visitForTestFunctionCall(_ node: FunctionCallExprSyntax) -> ExprSyntax {
         let converter = node.calledExpression.tokens(viewMode: .sourceAccurate).compactMap { token in
             xcTestAssertionConverters.find(by: token.text)

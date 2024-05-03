@@ -2,7 +2,7 @@ import Foundation
 import SwiftSyntax
 
 /// Rewriter for the whole test file. It expects to be used for SourceFileSyntax
-class TestSourceFileRewriter: SyntaxRewriter {
+class XCTestRewriter: SyntaxRewriter {
     let globalOptions: GlobalOptions
     
     init(globalOptions: GlobalOptions) {

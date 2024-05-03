@@ -7,7 +7,7 @@ private let fixtures: [ConversionTestFixture] = [
     .init("import Foundation", "import Foundation"),
 ]
 
-struct ImportStatementRewriterTests {
+struct ImportStatementTests {
     private let emitter = StringEmitter()
     
     @Test("All rewriters can convert syntaxes", arguments: fixtures)

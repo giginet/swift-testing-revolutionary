@@ -1,8 +1,8 @@
 import Foundation
 import SwiftSyntax
 
-/// Rewriter to rewrite XCTest's test methods to swift-testing.
-extension TestSourceFileRewriter {
+/// Visitor to rewrite XCTest's test methods to swift-testing.
+extension XCTestRewriter {
     func visitForTestFunctionDecl(_ node: FunctionDeclSyntax) -> DeclSyntax {
         guard let methodKind = detectMethodKind(of: node) else {
             return super.visit(node)
@@ -135,7 +135,7 @@ extension TestSourceFileRewriter {
     }
 }
 
-extension TestSourceFileRewriter {
+extension XCTestRewriter {
     fileprivate enum MethodKind {
         case testCase(String)
         case setUp

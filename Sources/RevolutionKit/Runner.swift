@@ -8,7 +8,7 @@ package struct Runner {
     
     init(globalOptions: GlobalOptions = .default) {
         self.globalOptions = globalOptions
-        self.rewriter = TestSourceFileRewriter(globalOptions: globalOptions)
+        self.rewriter = XCTestRewriter(globalOptions: globalOptions)
     }
     
     init(

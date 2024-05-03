@@ -1,8 +1,8 @@
 import Foundation
 import SwiftSyntax
 
-/// Rewriter to rewrite test XCTestCase class into swift-testing struct
-extension TestSourceFileRewriter {
+/// Visitor to rewrite test XCTestCase class into swift-testing struct
+extension XCTestRewriter {
     func visitForTestClass(_ node: ClassDeclSyntax) -> DeclSyntax {
         guard guessWhetherTestCaseClass(node) else {
             return super.visit(node)
