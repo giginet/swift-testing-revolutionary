@@ -112,10 +112,22 @@ extension InfixOperatorExpectConverter {
             ),
             rightOperand: rhs.with(\.leadingTrivia, .spaces(0))
         )
+        
+        // Drop lhs and rhs
+        let remaining = node.arguments.dropFirst(2)
+        
+        // If remaining arguments are exists, comma is required
+        let trailingComma: TokenSyntax? = if remaining.isEmpty {
+            nil
+        } else {
+            .commaToken(trailingTrivia: .space)
+        }
+        
         let newArgument = LabeledExprSyntax(
-            expression: infixOperatorSyntax
+            expression: infixOperatorSyntax,
+            trailingComma: trailingComma
         )
-        return buildArguments([newArgument], node: node)
+        return buildArguments([newArgument] + remaining, node: node)
     }
     
     func lhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {

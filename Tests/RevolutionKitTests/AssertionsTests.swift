@@ -184,7 +184,14 @@ private let fixtures: [ConversionTestFixture] = [
         #expect(!isValid, "value should be false")
         """
     ),
-    
+    .init(
+        """
+        XCTAssertEqual(1 + 1, 2, "value should be 2")
+        """,
+        """
+        #expect(1 + 1 == 2, "value should be 2")
+        """
+    ),    
 ]
 
 struct AssertionsTests {
