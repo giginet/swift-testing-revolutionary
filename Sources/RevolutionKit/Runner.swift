@@ -21,7 +21,7 @@ package struct Runner {
     
     func run<E: Emitter>(for source: String, emitter: E) -> E.EmitType {
         let sourceFile = Parser.parse(source: source)
-        let converted = rewriter.visit(sourceFile)
-        return emitter.emit(sourceFileSyntax: converted)
+        let converted = rewriter.rewrite(sourceFile, detach: true)
+        return emitter.emit(converted)
     }
 }

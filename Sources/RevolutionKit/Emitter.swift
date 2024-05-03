@@ -4,13 +4,13 @@ import SwiftSyntax
 protocol Emitter {
     associatedtype EmitType
     
-    func emit(sourceFileSyntax: SourceFileSyntax) -> EmitType
+    func emit(_ syntax: Syntax) -> EmitType
 }
 
 struct StringEmitter: Emitter {
     typealias EmitType = String
     
-    func emit(sourceFileSyntax: SourceFileSyntax) -> EmitType {
-        String(bytes: sourceFileSyntax.syntaxTextBytes, encoding: .utf8) ?? ""
+    func emit(_ syntax: Syntax) -> EmitType {
+        String(bytes: syntax.syntaxTextBytes, encoding: .utf8) ?? ""
     }
 }
