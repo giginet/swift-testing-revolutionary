@@ -5,6 +5,15 @@ private let xcTestAssertionConverters: [any AssertionConverter] = [
     XCTAssertConverter(),
     XCTAssertTrueConverter(),
     XCTAssertEqualConverter(),
+    XCTAssertNotEqualConverter(),
+    XCTAssertIdenticalConverter(),
+    XCTAssertNotIdenticalConverter(),
+    XCTAssertGreaterThanConverter(),
+    XCTAssertGreaterThanOrEqualConverter(),
+    XCTAssertLessThanOrEqualConverter(),
+    XCTAssertLessThanConverter(),
+    XCTAssertNilConverter(),
+    XCTAssertNotNilConverter(),
 ]
 
 

@@ -51,33 +51,33 @@ protocol InfixOperatorExpectConverter: ExpectConverter {
     
     var binaryOperator: String { get }
     
-    func lhs(from node: FunctionCallExprSyntax) -> LHS
-    func rhs(from node: FunctionCallExprSyntax) -> RHS
+    func lhs(from node: FunctionCallExprSyntax) -> LHS?
+    func rhs(from node: FunctionCallExprSyntax) -> RHS?
 }
 
 extension InfixOperatorExpectConverter {
     func argument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
-        guard node.arguments.count >= 2 else {
+        guard let lhs = lhs(from: node), let rhs = rhs(from: node) else {
             return nil
         }
         
         let infixOperatorSyntax = InfixOperatorExprSyntax(
-            leftOperand: lhs(from: node),
+            leftOperand: lhs,
             operator: BinaryOperatorExprSyntax(
                 leadingTrivia: .space,
                 operator: .binaryOperator(binaryOperator),
                 trailingTrivia: .space
             ),
-            rightOperand: rhs(from: node)
+            rightOperand: rhs
         )
         return LabeledExprSyntax(expression: infixOperatorSyntax)
     }
     
-    func lhs(from node: FunctionCallExprSyntax) -> some ExprSyntaxProtocol {
+    func lhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {
         return node.arguments[node.arguments.startIndex].expression
     }
     
-    func rhs(from node: FunctionCallExprSyntax) -> some ExprSyntaxProtocol {
+    func rhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {
         return node.arguments[node.arguments.index(at: 1)].expression
     }
 }
@@ -85,4 +85,59 @@ extension InfixOperatorExpectConverter {
 struct XCTAssertEqualConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertEqual"
     let binaryOperator = "=="
+}
+
+struct XCTAssertNotEqualConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertNotEqual"
+    let binaryOperator = "!="
+}
+
+struct XCTAssertIdenticalConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertIdentical"
+    let binaryOperator = "==="
+}
+
+struct XCTAssertNotIdenticalConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertNotIdentical"
+    let binaryOperator = "!=="
+}
+
+struct XCTAssertGreaterThanConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertGreaterThan"
+    let binaryOperator = ">"
+}
+
+struct XCTAssertGreaterThanOrEqualConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertGreaterThanOrEqual"
+    let binaryOperator = ">="
+}
+
+struct XCTAssertLessThanConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertLessThan"
+    let binaryOperator = "<"
+}
+
+struct XCTAssertLessThanOrEqualConverter: InfixOperatorExpectConverter {
+    let name = "XCTAssertLessThanOrEqual"
+    let binaryOperator = "<="
+}
+
+struct XCTAssertNilConverter: InfixOperatorExpectConverter {
+    typealias RHS = NilLiteralExprSyntax
+    let name = "XCTAssertNil"
+    let binaryOperator = "=="
+    
+    func rhs(from node: FunctionCallExprSyntax) -> RHS? {
+        NilLiteralExprSyntax()
+    }
+}
+
+struct XCTAssertNotNilConverter: InfixOperatorExpectConverter {
+    typealias RHS = NilLiteralExprSyntax
+    let name = "XCTAssertNotNil"
+    let binaryOperator = "!="
+    
+    func rhs(from node: FunctionCallExprSyntax) -> RHS? {
+        NilLiteralExprSyntax()
+    }
 }
