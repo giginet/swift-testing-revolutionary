@@ -58,9 +58,10 @@ extension SyntaxCollection {
         return nil
     }
     
-    mutating func replace(with elements: [Element]) -> Self {
-        removeAll()
-        append(contentsOf: elements)
-        return self
+    func replacing(with elements: [Element]) -> Self {
+        var node = self
+        node.removeAll()
+        node.append(contentsOf: elements)
+        return node
     }
 }

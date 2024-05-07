@@ -44,10 +44,8 @@ extension SingleArgumentExpectConverter {
         let first = node.arguments.first
         let remaining = node.arguments.dropFirst()
         
-        var arguments = node.arguments
-        
-        return arguments
-            .replace(with: [first].compactMap { $0 } + remaining)
+        return node.arguments
+            .replacing(with: [first].compactMap { $0 } + remaining)
     }
 }
 
@@ -74,9 +72,8 @@ struct XCTAssertFalseConverter: SingleArgumentExpectConverter {
             .with(\.expression, ExprSyntax(inverted))
         let remaining = node.arguments.dropFirst()
         
-        var arguments = node.arguments
-        return arguments
-            .replace(with: [newArgument].compactMap { $0 } + remaining)
+        return node.arguments
+            .replacing(with: [newArgument].compactMap { $0 } + remaining)
     }
 }
 
@@ -124,9 +121,8 @@ extension InfixOperatorExpectConverter {
             trailingComma: trailingComma
         )
         
-        var arguments = node.arguments
-        return arguments
-            .replace(with: [newArgument].compactMap { $0 } + remaining)
+        return node.arguments
+            .replacing(with: [newArgument].compactMap { $0 } + remaining)
     }
     
     func lhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {
@@ -211,9 +207,8 @@ struct XCTUnwrapConverter: RequireConverter {
     let name = "XCTUnwrap"
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        var arguments = node.arguments
-        return arguments
-            .replace(with: [node.arguments.first].compactMap { $0 })
+        return node.arguments
+            .replacing(with: [node.arguments.first].compactMap { $0 })
     }
 }
 
@@ -235,9 +230,8 @@ struct XCTFailConverter: AssertionConverter {
     }
     
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        var arguments = node.arguments
-        return arguments
-            .replace(with: [arguments.first].compactMap { $0 })
+        return node.arguments
+            .replacing(with: [node.arguments.first].compactMap { $0 })
     }
 }
 
@@ -361,9 +355,8 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionConverter {
             expression: anyErrorDotSelfExpr
         ) // throws: (any Error).self
         
-        var arguments = node.arguments
-        return arguments
-            .replace(with: [newArgument].compactMap { $0 })
+        return node.arguments
+            .replacing(with: [newArgument].compactMap { $0 })
     }
     
     private func buildTrailingClosureForTypeCheckingMacro(node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
@@ -438,9 +431,8 @@ struct XCTAssertNoThrowConverter: ErrorAssertionConverter {
             expression: neverError
         ) // throws: Never.self
         
-        var arguments = node.arguments
-        return arguments
-            .replace(with: [newArgument])
+        return node.arguments
+            .replacing(with: [newArgument])
     }
     
     func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
