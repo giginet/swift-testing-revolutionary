@@ -191,7 +191,34 @@ private let fixtures: [ConversionTestFixture] = [
         """
         #expect(1 + 1 == 2, "value should be 2")
         """
-    ),    
+    ),
+]
+
+let fixturesWithSourceLocations: [ConversionTestFixture] = [
+    .init(
+        """
+        XCTAssertTrue(isValid, "value should be true", line: 42)
+        """,
+        """
+        #expect(isValid, "value should be true", sourceLocation: SourceLocation(line: 42))
+        """
+    ),
+    .init(
+        """
+        XCTAssertTrue(isValid, "value should be true", file: #file)
+        """,
+        """
+        #expect(isValid, "value should be true", sourceLocation: SourceLocation(file: #file))
+        """
+    ),
+    .init(
+        """
+        XCTAssertEqual(1 + 1, 2, "value should be 2", file: #file, line: 42)
+        """,
+        """
+        #expect(1 + 1 == 2, "value should be 2", sourceLocation: SourceLocation(file: #file, line: 42))
+        """
+    ),
 ]
 
 struct AssertionsTests {
@@ -199,6 +226,14 @@ struct AssertionsTests {
     
     @Test("AssertionRewriter can rewrite all assertions", arguments: fixtures)
     private func rewriteAssertions(_ fixture: ConversionTestFixture) throws {
+        let runner = Runner()
+        
+        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        #expect(result == fixture.expected)
+    }
+    
+    @Test("AssertionRewriter can rewrite all assertions with source locations", arguments: fixturesWithSourceLocations)
+    private func rewriteAssertionsWithSourceLocations(_ fixture: ConversionTestFixture) throws {
         let runner = Runner()
         
         let result = runner.run(for: fixture.source, emitter: StringEmitter())

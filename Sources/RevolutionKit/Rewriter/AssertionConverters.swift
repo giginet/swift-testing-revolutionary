@@ -28,24 +28,92 @@ extension MacroAssertionConverter {
     }
 }
 
-protocol ExpectConverter: MacroAssertionConverter { }
+protocol ExpectConverter: MacroAssertionConverter {
+    var requiredArguments: Int { get }
+}
 
 extension ExpectConverter {
     var macroName: String { "expect" }
 }
 
 extension ExpectConverter {
+    func buildRemainingArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax {
+        var remainingArguments = LabeledExprListSyntax(node.arguments.dropFirst(requiredArguments))
+        
+        let convertedRemainingArguments = packToSourceLocation(
+            in: &remainingArguments
+        )
+        
+        return convertedRemainingArguments
+    }
+    
+    /// Trims the argument with the given label from the arguments list if it's found.
+    /// It returns the trimmed argument if found, otherwise nil.
+    /// The passed arguments list will be modified.
+    private func trimArgument(of label: String, from arguments: inout LabeledExprListSyntax) -> LabeledExprSyntax? {
+        guard let index = arguments.findIndex(where: { $0.label?.tokenKind == .identifier(label) }) else {
+            return nil
+        }
+        return arguments.remove(at: index)
+    }
+    
+    /// Pack file/line arguments in the given arguments into SourceLocation arguments
+    /// Example (file: "XXX", line: 999) -> (sourceLocation: SourceLocation(file: "XXX", line: 999))
+    private func packToSourceLocation(in arguments: inout LabeledExprListSyntax) -> LabeledExprListSyntax {
+        let fileArgument = trimArgument(of: "file", from: &arguments)
+        let lineArgument = trimArgument(of: "line", from: &arguments)
+        
+        guard (fileArgument != nil || lineArgument != nil) else {
+            return arguments
+        }
+        
+        var sourceLocationArguments = LabeledExprListSyntax()
+        if let fileArgument {
+            sourceLocationArguments.append(fileArgument)
+        }
+        
+        if let lineArgument {
+            sourceLocationArguments.append(lineArgument)
+        }
+        
+        let sourceLocationReferenceExpr = DeclReferenceExprSyntax(
+            baseName: .identifier("SourceLocation")
+        ) // SourceLocation
+        
+        let sourceLocationInitializerCallExpr = FunctionCallExprSyntax(
+            calledExpression: sourceLocationReferenceExpr,
+            leftParen: .leftParenToken(),
+            arguments: sourceLocationArguments,
+            rightParen: .rightParenToken()
+        ) // SourceLocation(file: "XXX", line: 999)
+        
+        let fileLocationArgumentExpr = LabeledExprSyntax(
+            label: .identifier("sourceLocation"),
+            colon: .colonToken(trailingTrivia: .space),
+            expression: sourceLocationInitializerCallExpr
+        ) // sourceLocation: SourceLocation()
+        
+        return arguments + [fileLocationArgumentExpr]
+    }
 }
 
-protocol SingleArgumentExpectConverter: ExpectConverter { }
+protocol SingleArgumentExpectConverter: ExpectConverter {
+    func firstArgument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax?
+}
 
 extension SingleArgumentExpectConverter {
+    var requiredArguments: Int { 1 }
+    
+    func firstArgument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+        node.arguments.first
+    }
+    
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        let first = node.arguments.first
-        let remaining = node.arguments.dropFirst()
+        guard let first = firstArgument(from: node) else { return nil }
+        let remaining = buildRemainingArguments(from: node)
         
         return node.arguments
-            .replacing(with: [first].compactMap { $0 } + remaining)
+            .replacing(with: [first] + remaining)
     }
 }
 
@@ -60,7 +128,7 @@ struct XCTAssertTrueConverter: SingleArgumentExpectConverter {
 struct XCTAssertFalseConverter: SingleArgumentExpectConverter {
     let name = "XCTAssertFalse"
     
-    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
+    func firstArgument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
         guard let firstArgument = node.arguments.first else {
             return nil
         }
@@ -68,12 +136,8 @@ struct XCTAssertFalseConverter: SingleArgumentExpectConverter {
             operator: .exclamationMarkToken(),
             expression: firstArgument.expression
         )
-        let newArgument = firstArgument
+        return firstArgument
             .with(\.expression, ExprSyntax(inverted))
-        let remaining = node.arguments.dropFirst()
-        
-        return node.arguments
-            .replacing(with: [newArgument].compactMap { $0 } + remaining)
     }
 }
 
@@ -91,6 +155,8 @@ protocol InfixOperatorExpectConverter: ExpectConverter {
 }
 
 extension InfixOperatorExpectConverter {
+    var requiredArguments: Int { 2 }
+    
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
         guard let lhs = lhs(from: node), let rhs = rhs(from: node) else {
             return nil
