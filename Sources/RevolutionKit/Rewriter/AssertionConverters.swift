@@ -30,6 +30,7 @@ extension MacroAssertionConverter {
 
 protocol ExpectConverter: MacroAssertionConverter {
     var requiredArguments: Int { get }
+    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax?
 }
 
 extension ExpectConverter {
@@ -37,6 +38,14 @@ extension ExpectConverter {
 }
 
 extension ExpectConverter {
+    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
+        guard let assertionArguments = assertionArguments(from: node) else { return nil }
+        let remaining = buildRemainingArguments(from: node)
+        
+        return node.arguments
+            .replacing(with: assertionArguments + remaining.map { $0 })
+    }
+    
     func buildRemainingArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax {
         var remainingArguments = LabeledExprListSyntax(node.arguments.dropFirst(requiredArguments))
         
@@ -59,7 +68,7 @@ extension ExpectConverter {
     
     /// Pack file/line arguments in the given arguments into SourceLocation arguments
     /// Example (file: "XXX", line: 999) -> (sourceLocation: SourceLocation(file: "XXX", line: 999))
-    private func packToSourceLocation(in arguments: inout LabeledExprListSyntax) -> LabeledExprListSyntax {
+    fileprivate func packToSourceLocation(in arguments: inout LabeledExprListSyntax) -> LabeledExprListSyntax {
         let fileArgument = trimArgument(of: "file", from: &arguments)
         let lineArgument = trimArgument(of: "line", from: &arguments)
         
@@ -98,22 +107,14 @@ extension ExpectConverter {
 }
 
 protocol SingleArgumentExpectConverter: ExpectConverter {
-    func firstArgument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax?
 }
 
 extension SingleArgumentExpectConverter {
     var requiredArguments: Int { 1 }
     
-    func firstArgument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
-        node.arguments.first
-    }
-    
-    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        guard let first = firstArgument(from: node) else { return nil }
-        let remaining = buildRemainingArguments(from: node)
-        
-        return node.arguments
-            .replacing(with: [first] + remaining)
+    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
+        guard let first = node.arguments.first else { return nil }
+        return [first]
     }
 }
 
@@ -128,16 +129,16 @@ struct XCTAssertTrueConverter: SingleArgumentExpectConverter {
 struct XCTAssertFalseConverter: SingleArgumentExpectConverter {
     let name = "XCTAssertFalse"
     
-    func firstArgument(from node: FunctionCallExprSyntax) -> LabeledExprSyntax? {
+    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
         guard let firstArgument = node.arguments.first else {
             return nil
         }
         let inverted = PrefixOperatorExprSyntax(
             operator: .exclamationMarkToken(),
             expression: firstArgument.expression
-        )
-        return firstArgument
-            .with(\.expression, ExprSyntax(inverted))
+        ) // !argument
+        return [firstArgument
+            .with(\.expression, ExprSyntax(inverted))]
     }
 }
 
@@ -157,7 +158,7 @@ protocol InfixOperatorExpectConverter: ExpectConverter {
 extension InfixOperatorExpectConverter {
     var requiredArguments: Int { 2 }
     
-    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
+    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
         guard let lhs = lhs(from: node), let rhs = rhs(from: node) else {
             return nil
         }
@@ -173,13 +174,13 @@ extension InfixOperatorExpectConverter {
         )
         
         // Drop lhs and rhs
-        let remaining = node.arguments.dropFirst(2)
+        let hasRemainingArguments = node.arguments.count > requiredArguments
         
         // If remaining arguments are exists, comma is required
-        let trailingComma: TokenSyntax? = if remaining.isEmpty {
-            nil
-        } else {
+        let trailingComma: TokenSyntax? = if hasRemainingArguments {
             .commaToken(trailingTrivia: .space)
+        } else {
+            nil
         }
         
         let newArgument = LabeledExprSyntax(
@@ -187,8 +188,7 @@ extension InfixOperatorExpectConverter {
             trailingComma: trailingComma
         )
         
-        return node.arguments
-            .replacing(with: [newArgument].compactMap { $0 } + remaining)
+        return [newArgument]
     }
     
     func lhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {
