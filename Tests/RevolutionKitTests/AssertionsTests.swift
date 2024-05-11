@@ -205,6 +205,20 @@ let fixturesWithSourceLocations: [ConversionTestFixture] = [
     ),
     .init(
         """
+        XCTAssertTrue(
+          isValid,
+          line: 42
+        )
+        """,
+        """
+        #expect(
+          isValid,sourceLocation: SourceLocation(
+          line: 42)
+        )
+        """
+    ),
+    .init(
+        """
         XCTAssertTrue(isValid, "value should be true", file: #file)
         """,
         """
