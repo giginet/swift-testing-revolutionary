@@ -57,11 +57,4 @@ extension SyntaxCollection {
         }
         return nil
     }
-    
-    func replacing(with elements: [Element]) -> Self {
-        var node = self
-        node.removeAll()
-        node.append(contentsOf: elements)
-        return node
-    }
 }
