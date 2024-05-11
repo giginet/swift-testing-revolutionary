@@ -1,7 +1,7 @@
 import Foundation
 import SwiftSyntax
 
-protocol Emitter {
+package protocol Emitter {
     associatedtype EmitType
     
     func emit(_ syntax: Syntax) -> EmitType

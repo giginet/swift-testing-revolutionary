@@ -168,26 +168,26 @@ struct TestMethodsTests {
     private let emitter = StringEmitter()
     
     @Test("TestMethodsRewriter can convert test cases", arguments: testCaseConversionFixtures)
-    private func rewriteTestCases(_ fixture: ConversionTestFixture) throws {
+    private func rewriteTestCases(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
     
     @Test("TestMethodsRewriter can convert setUp methods", arguments: setUpConversionFixtures)
-    private func rewriteSetUps(_ fixture: ConversionTestFixture) throws {
+    private func rewriteSetUps(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
     
     @Test("TestMethodsRewriter can convert tearDown methods", arguments: tearDownConversionFixtures)
-    private func rewriteTearDowns(_ fixture: ConversionTestFixture) throws {
+    private func rewriteTearDowns(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
 }

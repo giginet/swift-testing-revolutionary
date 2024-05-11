@@ -11,10 +11,10 @@ struct ImportStatementTests {
     private let emitter = StringEmitter()
     
     @Test("All rewriters can convert syntaxes", arguments: fixtures)
-    private func rewriter(_ fixture: ConversionTestFixture) throws {
+    private func rewriter(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
     }
 }

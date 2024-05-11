@@ -287,18 +287,18 @@ struct AssertionsTests {
     private let emitter = StringEmitter()
     
     @Test("AssertionRewriter can rewrite all assertions", arguments: fixtures)
-    private func rewriteAssertions(_ fixture: ConversionTestFixture) throws {
+    private func rewriteAssertions(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
     }
     
     @Test("AssertionRewriter can rewrite all assertions with source locations", arguments: fixturesWithSourceLocations)
-    private func rewriteAssertionsWithSourceLocations(_ fixture: ConversionTestFixture) throws {
+    private func rewriteAssertionsWithSourceLocations(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
     }
 }

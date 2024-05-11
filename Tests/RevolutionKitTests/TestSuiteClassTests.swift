@@ -92,18 +92,18 @@ struct TestSuiteClassTests {
     private let emitter = StringEmitter()
     
     @Test("TestClassRewriter can convert test class definitions to struct", arguments: structConversionFixtures)
-    private func rewriterCanConvertsToStruct(_ fixture: ConversionTestFixture) throws {
+    private func rewriterCanConvertsToStruct(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
     
     @Test("TestClassRewriter can convert test class definitions to classes", arguments: classConversionFixtures)
-    private func rewriterCanConvertsToTests(_ fixture: ConversionTestFixture) throws {
+    private func rewriterCanConvertsToTests(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner(globalOptions: .init(enableStructConversion: false))
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try await runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
     }
 }

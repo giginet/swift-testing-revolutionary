@@ -8,9 +8,9 @@ struct RunnerTests {
     private let runner = Runner()
     
     @Test("Runner can convert all fixtures", arguments: try! fixtureLoader.loadFixtures())
-    func replaceAllFixtures(fixture: ConversionTestFixture) {
+    func replaceAllFixtures(fixture: ConversionTestFixture) async throws {
         let source = fixture.source
-        let converted = runner.run(for: source, emitter: StringEmitter())
+        let converted = try await runner.run(for: source, emitter: StringEmitter())
         #expect(converted == fixture.expected)
     }
 }
