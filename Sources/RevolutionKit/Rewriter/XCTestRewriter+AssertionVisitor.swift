@@ -38,7 +38,7 @@ extension XCTestRewriter {
 extension [any AssertionConverter] {
     fileprivate func find(by name: String) -> Element? {
         first { converter in
-            converter.name == name
+            converter.xcTestAssertionName == name
         }
     }
 }
