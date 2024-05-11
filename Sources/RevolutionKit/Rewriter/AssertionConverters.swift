@@ -13,6 +13,9 @@ protocol AssertionConverter {
     
     /// Convert original arguments to for the new assertion call
     func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax
+    
+    /// Convert remaining arguments
+    func convertRemainingArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax
 }
 
 extension AssertionConverter {
@@ -22,13 +25,33 @@ extension AssertionConverter {
         
         return arguments
     }
+}
+
+protocol MacroAssertionConverter: AssertionConverter {
+    var macroName: String { get }
+}
+
+extension MacroAssertionConverter {
+    func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
+        guard let arguments = arguments(from: node) else {
+            return nil
+        }
+        
+        return MacroExpansionExprSyntax(
+            leadingTrivia: node.leadingTrivia,
+            macroName: .identifier(macroName),
+            leftParen: node.leftParen,
+            arguments: arguments,
+            rightParen: node.rightParen,
+            trailingTrivia: node.trailingTrivia
+        )
+    }
     
     func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
         // Do not convert any arguments in default
         arguments
     }
     
-    /// Convert remaining arguments
     func convertRemainingArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
         var mutableArguments = arguments
         
@@ -84,27 +107,6 @@ extension AssertionConverter {
             return nil
         }
         return arguments.remove(at: index)
-    }
-}
-
-protocol MacroAssertionConverter: AssertionConverter {
-    var macroName: String { get }
-}
-
-extension MacroAssertionConverter {
-    func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
-        guard let arguments = arguments(from: node) else {
-            return nil
-        }
-        
-        return MacroExpansionExprSyntax(
-            leadingTrivia: node.leadingTrivia,
-            macroName: .identifier(macroName),
-            leftParen: node.leftParen,
-            arguments: arguments,
-            rightParen: node.rightParen,
-            trailingTrivia: node.trailingTrivia
-        )
     }
 }
 
@@ -304,6 +306,14 @@ struct XCTFailConverter: AssertionConverter {
         
         return node
             .with(\.calledExpression, ExprSyntax(newCallExpr))
+    }
+    
+    func convertAssertionArguments(of arguments: SwiftSyntax.LabeledExprListSyntax) -> SwiftSyntax.LabeledExprListSyntax {
+        arguments
+    }
+    
+    func convertRemainingArguments(of arguments: SwiftSyntax.LabeledExprListSyntax) -> SwiftSyntax.LabeledExprListSyntax {
+        arguments
     }
 }
 
