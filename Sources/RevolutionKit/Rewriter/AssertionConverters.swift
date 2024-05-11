@@ -322,7 +322,23 @@ protocol ErrorAssertionExpectConverter: MacroAssertionConverter, ExpectConverter
 }
 
 extension ErrorAssertionExpectConverter {
-    fileprivate func convertArgumentsToClosure(of node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
+    /// Build `#expect` macro which has trailing closure it calls the previous argument
+    /// functionName(args) -> functionName(arguments) { args }
+    fileprivate func buildExpectMacroMovingArgumentsToTrailingClosure(node: FunctionCallExprSyntax) -> MacroExpansionExprSyntax? {
+        guard let arguments = arguments(from: node), let trailingClosure = trailingClosure(from: node) else {
+            return nil
+        }
+        
+        return MacroExpansionExprSyntax(
+            macroName: .identifier("expect"),
+            leftParen: .leftParenToken(),
+            arguments: arguments,
+            rightParen: .rightParenToken(),
+            trailingClosure: trailingClosure
+        )
+    }
+    
+    func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
         guard let closureCall = node.arguments.first else {
             return nil
         }
@@ -337,22 +353,6 @@ extension ErrorAssertionExpectConverter {
         return ClosureExprSyntax(
             leadingTrivia: .space,
             statements: codeBlockItems
-        )
-    }
-    
-    /// Build `#expect` macro which has trailing closure it calls the previous argument
-    /// functionName(args) -> functionName(arguments) { args }
-    fileprivate func buildExpectMacroMovingArgumentsToTrailingClosure(node: FunctionCallExprSyntax) -> MacroExpansionExprSyntax? {
-        guard let arguments = arguments(from: node), let trailingClosure = trailingClosure(from: node) else {
-            return nil
-        }
-        
-        return MacroExpansionExprSyntax(
-            macroName: .identifier("expect"),
-            leftParen: .leftParenToken(),
-            arguments: arguments,
-            rightParen: .rightParenToken(),
-            trailingClosure: trailingClosure
         )
     }
 }
@@ -383,7 +383,16 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionExpectConverter {
     
     func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
         // FIXME
-        return arguments
+        guard let node = arguments.parent?.cast(FunctionCallExprSyntax.self) else {
+            return arguments
+        }
+        let macroType = expectMacroType(of: node)
+        switch macroType {
+        case .typeChecking:
+            return buildArgumentsForTypeCheckingMacro(node: node)
+        case .conditionChecking:
+            return LabeledExprListSyntax(arguments.dropFirst())
+        }
     }
     
     func buildExpr(from node: FunctionCallExprSyntax) -> (any ExprSyntaxProtocol)? {
@@ -394,25 +403,9 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionExpectConverter {
             return buildErrorTypeCheckingExpectMacro(node: node)
         }
     }
-    
-    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        switch expectMacroType(of: node) {
-        case .conditionChecking:
-            return buildArgumentsForConditionCheckingMacro(node: node)
-        case .typeChecking:
-            return buildArgumentsForTypeCheckingMacro(node: node)
-        }
-    }
-    
-    func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
-        switch expectMacroType(of: node) {
-        case .conditionChecking:
-            fatalError("Do not call this function for conditional checking")
-        case .typeChecking:
-            return buildTrailingClosureForTypeCheckingMacro(node: node)
-        }
-    }
-    
+}
+
+extension XCTAssertThrowsErrorConverter {
     /// Build #expect macro node to check Error type.
     /// It would be called when the original node doesn't have any trailing closures.
     private func buildErrorTypeCheckingExpectMacro(node: FunctionCallExprSyntax) -> MacroExpansionExprSyntax? {
@@ -440,14 +433,11 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionExpectConverter {
             expression: anyErrorDotSelfExpr
         ) // throws: (any Error).self
         
-        return node.arguments
-            .replacing(with: [newArgument].compactMap { $0 })
+        return node.arguments.with(\.[node.arguments.startIndex], newArgument)
     }
-    
-    private func buildTrailingClosureForTypeCheckingMacro(node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
-        convertArgumentsToClosure(of: node)
-    }
-    
+}
+
+extension XCTAssertThrowsErrorConverter {
     /// Build #expect macro node to check Error conditions.
     /// It would be called when the original node has a trailing closure.
     private func buildCheckingErrorConditionExpectMacro(node: FunctionCallExprSyntax) -> MacroExpansionExprSyntax? {
@@ -455,7 +445,7 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionExpectConverter {
             return nil
         }
         
-        guard let performingTrailingClosure = buildPerformingTrailingClosureForConditionCheckingMacro(node: node),
+        guard let performingTrailingClosure = trailingClosure(from: node),
               let throwsTrailingClosure = buildThrowsTrailingClosureForConditionCheckingMacro(node: node) else {
             return nil
         }
@@ -481,17 +471,6 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionExpectConverter {
         ) // #expect { ... } throws: { ... }
     }
     
-    private func buildArgumentsForConditionCheckingMacro(node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        // the first argument will move to the first trailing closure. So remaining arguments will be new arguments
-        var arguments = node.arguments
-        arguments.remove(at: arguments.startIndex)
-        return arguments
-    }
-    
-    private func buildPerformingTrailingClosureForConditionCheckingMacro(node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
-        convertArgumentsToClosure(of: node)
-    }
-    
     private func buildThrowsTrailingClosureForConditionCheckingMacro(node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
         node.trailingClosure
     }
@@ -505,7 +484,7 @@ struct XCTAssertNoThrowConverter: ErrorAssertionExpectConverter {
         buildExpectMacroMovingArgumentsToTrailingClosure(node: node)
     }
     
-    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
+    func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
         let neverError = MemberAccessExprSyntax(
             base: DeclReferenceExprSyntax(baseName: .identifier("Never")),
             name: .keyword(.self)
@@ -516,11 +495,6 @@ struct XCTAssertNoThrowConverter: ErrorAssertionExpectConverter {
             expression: neverError
         ) // throws: Never.self
         
-        return node.arguments
-            .replacing(with: [newArgument])
-    }
-    
-    func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
-        convertArgumentsToClosure(of: node)
+        return arguments.with(\.[arguments.startIndex], newArgument)
     }
 }

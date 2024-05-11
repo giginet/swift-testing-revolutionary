@@ -243,6 +243,14 @@ let fixturesWithSourceLocations: [ConversionTestFixture] = [
         #expect(throws: (any Error).self, "f() should raise error", sourceLocation: SourceLocation(file: #file, line: 42)) { try f() }
         """
     ),
+    .init(
+        """
+        XCTAssertThrowsError(try f(), "f() should raise error", file: #file, line: 42) { error in }
+        """,
+        """
+        #expect("f() should raise error", sourceLocation: SourceLocation(file: #file, line: 42)) { try f() } throws: { error in }
+        """
+    ),
 ]
 
 struct AssertionsTests {
