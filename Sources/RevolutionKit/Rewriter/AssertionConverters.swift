@@ -9,6 +9,7 @@ protocol AssertionConverter {
 
 protocol MacroAssertionConverter: AssertionConverter {
     var macroName: String { get }
+    func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax
 }
 
 extension MacroAssertionConverter {
@@ -28,32 +29,20 @@ extension MacroAssertionConverter {
     }
 }
 
-protocol ExpectConverter: MacroAssertionConverter {
-    var requiredArguments: Int { get }
-    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax?
-}
-
-extension ExpectConverter {
-    var macroName: String { "expect" }
-}
-
-extension ExpectConverter {
+extension MacroAssertionConverter {
     func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        guard let assertionArguments = assertionArguments(from: node) else { return nil }
-        let remaining = buildRemainingArguments(from: node)
+        let convertedArguments = convertAssertionArguments(of: node.arguments)
+        let arguments = convertRemainingArguments(of: convertedArguments)
         
-        return node.arguments
-            .replacing(with: assertionArguments + remaining.map { $0 })
+        return arguments
     }
     
-    func buildRemainingArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax {
-        var remainingArguments = LabeledExprListSyntax(node.arguments.dropFirst(requiredArguments))
+    func convertRemainingArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
+        var mutableArguments = arguments
         
-        let convertedRemainingArguments = packToSourceLocation(
-            in: &remainingArguments
+        return packToSourceLocation(
+            in: &mutableArguments
         )
-        
-        return convertedRemainingArguments
     }
     
     /// Trims the argument with the given label from the arguments list if it's found.
@@ -106,17 +95,26 @@ extension ExpectConverter {
     }
 }
 
-protocol SingleArgumentExpectConverter: ExpectConverter {
+protocol SingleArgumentConverter: MacroAssertionConverter {
 }
 
-extension SingleArgumentExpectConverter {
+extension SingleArgumentConverter {
     var requiredArguments: Int { 1 }
     
-    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        guard let first = node.arguments.first else { return nil }
-        return [first]
+    func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
+        return arguments
     }
 }
+
+protocol ExpectConverter: MacroAssertionConverter { }
+
+extension ExpectConverter {
+    var macroName: String { "expect" }
+}
+
+protocol SingleArgumentExpectConverter: SingleArgumentConverter, ExpectConverter {
+}
+
 
 struct XCTAssertConverter: SingleArgumentExpectConverter {
     let name = "XCTAssert"
@@ -129,16 +127,19 @@ struct XCTAssertTrueConverter: SingleArgumentExpectConverter {
 struct XCTAssertFalseConverter: SingleArgumentExpectConverter {
     let name = "XCTAssertFalse"
     
-    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        guard let firstArgument = node.arguments.first else {
-            return nil
+    func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
+        guard let firstArgument = arguments.first else {
+            return arguments
         }
         let inverted = PrefixOperatorExprSyntax(
             operator: .exclamationMarkToken(),
             expression: firstArgument.expression
         ) // !argument
-        return [firstArgument
-            .with(\.expression, ExprSyntax(inverted))]
+        let newFirstArgument = firstArgument
+            .with(\.expression, ExprSyntax(inverted))
+        
+        let firstIndex = arguments.startIndex
+        return arguments.with(\.[firstIndex], newFirstArgument)
     }
 }
 
@@ -150,17 +151,16 @@ protocol InfixOperatorExpectConverter: ExpectConverter {
     associatedtype RHS: ExprSyntaxProtocol
     
     var binaryOperator: String { get }
+    var assertionArgumentsCount: Int { get }
     
-    func lhs(from node: FunctionCallExprSyntax) -> LHS?
-    func rhs(from node: FunctionCallExprSyntax) -> RHS?
+    func lhs(from arguments: LabeledExprListSyntax) -> LHS?
+    func rhs(from arguments: LabeledExprListSyntax) -> RHS?
 }
 
 extension InfixOperatorExpectConverter {
-    var requiredArguments: Int { 2 }
-    
-    func assertionArguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        guard let lhs = lhs(from: node), let rhs = rhs(from: node) else {
-            return nil
+    func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
+        guard let lhs = lhs(from: arguments), let rhs = rhs(from: arguments) else {
+            return arguments
         }
         
         let infixOperatorSyntax = InfixOperatorExprSyntax(
@@ -174,7 +174,7 @@ extension InfixOperatorExpectConverter {
         )
         
         // Drop lhs and rhs
-        let hasRemainingArguments = node.arguments.count > requiredArguments
+        let hasRemainingArguments = arguments.count > assertionArgumentsCount
         
         // If remaining arguments are exists, comma is required
         let trailingComma: TokenSyntax? = if hasRemainingArguments {
@@ -188,64 +188,74 @@ extension InfixOperatorExpectConverter {
             trailingComma: trailingComma
         )
         
-        return [newArgument]
+        let remainingArguments = arguments.dropFirst(assertionArgumentsCount)
+        return [newArgument] + remainingArguments
     }
     
-    func lhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {
-        return node.arguments[node.arguments.startIndex].expression
+    func lhs(from arguments: LabeledExprListSyntax) -> (some ExprSyntaxProtocol)? {
+        return arguments[arguments.startIndex].expression
     }
     
-    func rhs(from node: FunctionCallExprSyntax) -> (some ExprSyntaxProtocol)? {
-        return node.arguments[node.arguments.index(at: 1)].expression
+    func rhs(from arguments: LabeledExprListSyntax) -> (some ExprSyntaxProtocol)? {
+        return arguments[arguments.index(at: 1)].expression
     }
 }
 
 struct XCTAssertEqualConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertEqual"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = "=="
 }
 
 struct XCTAssertNotEqualConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertNotEqual"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = "!="
 }
 
 struct XCTAssertIdenticalConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertIdentical"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = "==="
 }
 
 struct XCTAssertNotIdenticalConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertNotIdentical"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = "!=="
 }
 
 struct XCTAssertGreaterThanConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertGreaterThan"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = ">"
 }
 
 struct XCTAssertGreaterThanOrEqualConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertGreaterThanOrEqual"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = ">="
 }
 
 struct XCTAssertLessThanConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertLessThan"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = "<"
 }
 
 struct XCTAssertLessThanOrEqualConverter: InfixOperatorExpectConverter {
     let name = "XCTAssertLessThanOrEqual"
+    let assertionArgumentsCount: Int = 2
     let binaryOperator = "<="
 }
 
 struct XCTAssertNilConverter: InfixOperatorExpectConverter {
     typealias RHS = NilLiteralExprSyntax
     let name = "XCTAssertNil"
+    let assertionArgumentsCount: Int = 1
     let binaryOperator = "=="
     
-    func rhs(from node: FunctionCallExprSyntax) -> RHS? {
+    func rhs(from arguments: LabeledExprListSyntax) -> RHS? {
         NilLiteralExprSyntax()
     }
 }
@@ -253,9 +263,10 @@ struct XCTAssertNilConverter: InfixOperatorExpectConverter {
 struct XCTAssertNotNilConverter: InfixOperatorExpectConverter {
     typealias RHS = NilLiteralExprSyntax
     let name = "XCTAssertNotNil"
+    let assertionArgumentsCount: Int = 1
     let binaryOperator = "!="
     
-    func rhs(from node: FunctionCallExprSyntax) -> RHS? {
+    func rhs(from arguments: LabeledExprListSyntax) -> RHS? {
         NilLiteralExprSyntax()
     }
 }
@@ -269,13 +280,8 @@ extension RequireConverter {
     var macroName: String { "require" }
 }
 
-struct XCTUnwrapConverter: RequireConverter {
+struct XCTUnwrapConverter: SingleArgumentConverter, RequireConverter {
     let name = "XCTUnwrap"
-    
-    func arguments(from node: FunctionCallExprSyntax) -> LabeledExprListSyntax? {
-        return node.arguments
-            .replacing(with: [node.arguments.first].compactMap { $0 })
-    }
 }
 
 // MARK: XCTFail
@@ -303,11 +309,16 @@ struct XCTFailConverter: AssertionConverter {
 
 // MARK: XCTAssertThrowsError / XCTAssertNoThrow
 
-protocol ErrorAssertionConverter: MacroAssertionConverter {
+protocol ErrorAssertionExpectConverter: MacroAssertionConverter, ExpectConverter {
     func trailingClosure(from node: FunctionCallExprSyntax) -> ClosureExprSyntax?
 }
 
-extension ErrorAssertionConverter {
+extension ErrorAssertionExpectConverter {
+    func convertAssertionArguments(of arguments: LabeledExprListSyntax) -> LabeledExprListSyntax {
+        // FIXME
+        return arguments
+    }
+    
     fileprivate func convertArgumentsToClosure(of node: FunctionCallExprSyntax) -> ClosureExprSyntax? {
         guard let closureCall = node.arguments.first else {
             return nil
@@ -343,7 +354,7 @@ extension ErrorAssertionConverter {
     }
 }
 
-struct XCTAssertThrowsErrorConverter: ErrorAssertionConverter {
+struct XCTAssertThrowsErrorConverter: ErrorAssertionExpectConverter {
     let name = "XCTAssertThrowsError"
     let macroName = "expect"
     
@@ -478,7 +489,7 @@ struct XCTAssertThrowsErrorConverter: ErrorAssertionConverter {
     }
 }
 
-struct XCTAssertNoThrowConverter: ErrorAssertionConverter {
+struct XCTAssertNoThrowConverter: ErrorAssertionExpectConverter {
     let name = "XCTAssertNoThrow"
     let macroName = "expect"
     

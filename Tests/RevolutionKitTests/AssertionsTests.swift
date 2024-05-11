@@ -219,6 +219,30 @@ let fixturesWithSourceLocations: [ConversionTestFixture] = [
         #expect(1 + 1 == 2, "value should be 2", sourceLocation: SourceLocation(file: #file, line: 42))
         """
     ),
+    .init(
+        """
+        XCTAssertNil(value, "value should be 2", file: #file, line: 42)
+        """,
+        """
+        #expect(value == nil, "value should be 2", sourceLocation: SourceLocation(file: #file, line: 42))
+        """
+    ),
+    .init(
+        """
+        XCTUnwrap(value, "value can be unwrapped", file: #file, line: 42)
+        """,
+        """
+        #require(value, "value can be unwrapped", sourceLocation: SourceLocation(file: #file, line: 42))
+        """
+    ),
+    .init(
+        """
+        XCTAssertThrowsError(try f(), "f() should raise error", file: #file, line: 42)
+        """,
+        """
+        #expect(throws: (any Error).self, "f() should raise error", sourceLocation: SourceLocation(file: #file, line: 42)) { try f() }
+        """
+    ),
 ]
 
 struct AssertionsTests {
