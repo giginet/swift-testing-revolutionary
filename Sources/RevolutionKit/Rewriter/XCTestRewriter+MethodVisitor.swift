@@ -23,7 +23,7 @@ extension XCTestRewriter {
     private func rewriteTestCase(node: FunctionDeclSyntax) -> DeclSyntax {
         let testCaseName = node.name.text
         let newTestCaseName = if globalOptions.enableStrippingTestPrefix {
-            stripTestPrefix(of: testCaseName)
+            strippingTestPrefix(of: testCaseName)
         } else {
             testCaseName
         }
@@ -94,7 +94,7 @@ extension XCTestRewriter {
     /// Strip first `test` prefix from test case names.
     /// `testCamelCase` -> `camelCase`
     /// `test` -> `test`
-    private func stripTestPrefix(of testCaseName: String) -> String {
+    private func strippingTestPrefix(of testCaseName: String) -> String {
         precondition(testCaseName.hasPrefix("test"))
         
         return {
