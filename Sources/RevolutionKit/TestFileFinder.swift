@@ -21,7 +21,7 @@ struct TestFileFinder {
             return []
         }
         
-        let contentURLs = contents.compactMap(URL.init(string:))
+        let contentURLs = contents.map { url.appending(path: $0) }
         return contentURLs.flatMap { url in
             walkFiles(in: url)
         }

@@ -27,16 +27,17 @@ package struct Runner {
         await withThrowingTaskGroup(of: Void.self) { group in
             for testFile in allTestFiles {
                 group.addTask {
-                    try run(for: testFile, emitter: StringEmitter())
+                    try run(for: testFile, emitter: StandardOutputEmitter())
                 }
             }
+            try? await group.waitForAll()
         }
     }
     
     @discardableResult
     func run<E: Emitter>(for sourceFile: URL, emitter: E) throws -> E.EmitType {
-        let data = try Data(contentsOf: sourceFile)
-        guard let sourceContents = String(data: data, encoding: .utf8) else {
+        guard let data = FileManager.default.contents(atPath: sourceFile.path()),
+                let sourceContents = String(data: data, encoding: .utf8) else {
             throw Error.unableToLoadSource(at: sourceFile)
         }
         return run(for: sourceContents, emitter: emitter)

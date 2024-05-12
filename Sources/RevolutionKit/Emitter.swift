@@ -14,3 +14,14 @@ struct StringEmitter: Emitter {
         String(bytes: syntax.syntaxTextBytes, encoding: .utf8) ?? ""
     }
 }
+
+struct StandardOutputEmitter: Emitter {
+    typealias EmitType = Void
+    
+    func emit(_ syntax: Syntax) -> Void {
+        guard let result = String(bytes: syntax.syntaxTextBytes, encoding: .utf8) else {
+            return
+        }
+        print(result)
+    }
+}
