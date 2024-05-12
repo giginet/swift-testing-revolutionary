@@ -1,13 +1,14 @@
+import Foundation
 import ArgumentParser
 import RevolutionKit
 
 @main
 struct SwiftTestingRevolutionaryCommand: AsyncParsableCommand {
+    @Argument(help: "Test files to convert", completion: .file(extensions: ["swift"]))
+    var files: [String]
+    
     @Flag(help: "Whether overwrite converted files")
     var dryRun: Bool = false
-    
-    @Flag(help: "Whether skipping unsupported APIs")
-    var skipUnsupportedAPI: Bool = false
     
     @Flag(inversion: .prefixedEnableDisable, help: "Whether converting testcase class to struct or not")
     var structConversion: Bool = true
@@ -16,8 +17,19 @@ struct SwiftTestingRevolutionaryCommand: AsyncParsableCommand {
     var stripTestPrefix: Bool = true
     
     func run() async throws {
-        let runner = Runner()
+        let options = buildRunnerOptions()
         
-        try await runner.run(for: [])
+        let runner = Runner(globalOptions: options)
+        
+        let fileURLs = files.compactMap(URL.init(string:))
+        try await runner.run(for: fileURLs)
+    }
+    
+    private func buildRunnerOptions() -> GlobalOptions {
+        return .init(
+            isDryRunMode: dryRun,
+            enableStructConversion: structConversion,
+            enableStrippingTestPrefix: stripTestPrefix
+        )
     }
 }
