@@ -19,15 +19,31 @@ struct SwiftTestingRevolutionaryPlugin: CommandPlugin {
 
 #if canImport(XcodeProjectPlugin)
 
-struct SwiftTestingRevolutionaryXcodePlugin: XcodeCommandPlugin {
-    func performCommand(context: XcodePluginContext, arguments: [String]) throws {
+extension SwiftTestingRevolutionaryPlugin: XcodeCommandPlugin {
+    func performCommand(context: XcodeProjectPlugin.XcodePluginContext, arguments: [String]) throws {
         let revolutionaryExecutable = try context.tool(named: "swift-testing-revolutionary")
         
-        let allTestFiles = context.xcodeProject.filePaths
-            .filter { $0.lastComponent.hasSuffix("Tests.swift") }
+        var extractor = ArgumentExtractor(arguments)
+        let targetNames = extractor.extractOption(named: "target")
         
-        let argumentsToExecute = arguments + allTestFiles.map { $0.string }
+        let allTestFiles = targetNames.reduce([]) { files, targetName -> [File] in
+            guard let target = context.xcodeProject.target(named: targetName) else {
+                return files
+            }
+            
+            let allTestFiles = target.inputFiles
+                .filter { $0.path.lastComponent.hasSuffix("Tests.swift") }
+            return files + allTestFiles
+        }
+        
+        let argumentsToExecute = extractor.remainingArguments + allTestFiles.map { $0.path.string }
         try performTool(executablePath: revolutionaryExecutable.path.url, arguments: argumentsToExecute)
+    }
+}
+
+extension XcodeProject {
+    fileprivate func target(named targetName: String) -> XcodeTarget? {
+        targets.first { $0.displayName == targetName }
     }
 }
 
