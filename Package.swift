@@ -52,7 +52,7 @@ let package = Package(
                     description: "Convert XCTest cases to swift-testing"
                 ),
                 permissions: [
-                    .writeToPackageDirectory(reason: "Rewrite implementations")
+                    .writeToPackageDirectory(reason: "Rewrite implementations"),
                 ]
             )
         ),
