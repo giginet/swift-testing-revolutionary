@@ -14,7 +14,7 @@ struct ImportStatementTests {
     private func rewriter(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
-        let result = runner.run(for: fixture.source, emitter: StringEmitter())
+        let result = try runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected)
     }
 }

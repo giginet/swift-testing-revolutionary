@@ -24,13 +24,25 @@ package struct Runner {
         
         let allTestFiles = testFileFinder.findTestFiles(in: sources)
         
+        let isDryRunMode = globalOptions.isDryRunMode
+        
         await withThrowingTaskGroup(of: Void.self) { group in
             for testFile in allTestFiles {
                 group.addTask {
-                    try run(for: testFile, emitter: StandardOutputEmitter())
+                    let emitter = emitter(for: testFile, isDryRunMode: isDryRunMode)
+                    
+                    try run(for: testFile, emitter: emitter)
                 }
             }
             try? await group.waitForAll()
+        }
+    }
+    
+    private func emitter(for testFile: URL, isDryRunMode: Bool) -> any Emitter {
+        if isDryRunMode {
+            DryRunEmitter(filePath: testFile)
+        } else {
+            OverwriteEmitter(filePath: testFile)
         }
     }
     
@@ -40,14 +52,14 @@ package struct Runner {
                 let sourceContents = String(data: data, encoding: .utf8) else {
             throw Error.unableToLoadSource(at: sourceFile)
         }
-        return run(for: sourceContents, emitter: emitter)
+        return try run(for: sourceContents, emitter: emitter)
     }
     
     @discardableResult
-    func run<E: Emitter>(for source: String, emitter: E) -> E.EmitType {
+    func run<E: Emitter>(for source: String, emitter: E) throws -> E.EmitType {
         let sourceFile = Parser.parse(source: source)
         let converted = rewriter.rewrite(sourceFile, detach: true)
-        return emitter.emit(converted)
+        return try emitter.emit(converted)
     }
 }
 
