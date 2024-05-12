@@ -54,7 +54,10 @@ let package = Package(
                 permissions: [
                     .writeToPackageDirectory(reason: "Rewrite implementations"),
                 ]
-            )
+            ),
+            dependencies: [
+                .target(name: "swift-testing-revolutionary"),
+            ]
         ),
         .executableTarget(
             name: "swift-testing-revolutionary",
