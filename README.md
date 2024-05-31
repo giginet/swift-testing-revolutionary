@@ -49,8 +49,10 @@ let package = Package(
 
 #### 2. Run the plugin on your package
 
+You can pass the directories or files you want to convert.
+
 ```console
-$ swift package plugin --allow-writing-to-package-directory swift-testing-revolutionary Tests
+$ swift package plugin --allow-writing-to-package-directory swift-testing-revolutionary Tests/ MyTests1.swift MyTests2.swift
 ```
 
 ### Command Line Tool
