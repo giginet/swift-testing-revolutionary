@@ -11,15 +11,32 @@ This tool provides three ways to use. As an Xcode Plugin, as a Command Plugin, o
 
 **In default, all test files will be overwritten unless you passed `--dry-run` flag. Please make sure to backup your test files before running this tool.**
 
-### As Xcode Plugin
+### Xcode Plugin
 
 For Xcode project, it's better to use as a Xcode plugin.
 
-### As Command Plugin
+### 1. Add package to your Xcode project
+
+- File > Swift Packages > Add Package Dependency
+- Add https://github.com/giginet/swift-testing-revolutionary.git Select "Up to Next Major" with "0.1.0"
+
+### 2. Right click on your project root and select `RevolutionaryPlugin`.
+
+![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/run-plugin.png)
+
+### 3. Choose the test target you want to convert.
+
+![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/choose-target.png)
+
+### 4. Allow change access if needed.
+
+![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/permission.png)
+
+### Package Command Plugin
 
 For Swift packages, it's better to use as a package plugin.
 
-1. Add package plugin to your package
+#### 1. Add package plugin to your package
 
 ```swift
 let package = Package(
@@ -30,17 +47,37 @@ let package = Package(
 )
 ```
 
-2. Run the plugin on your package
+#### 2. Run the plugin on your package
 
 ```console
 $ swift package plugin --allow-writing-to-package-directory swift-testing-revolutionary Tests
 ```
 
-### As Command Line Tool
+### Command Line Tool
+
+Install this tool and run it from the command line.
 
 ```console
-$ swift-testing-revolutionary path/to/your/tests
+$ swift-testing-revolutionary path/to/Tests
 ```
+
+#### Using Mint
+
+```console
+$ mint install giginet/swift-testing-revolutionary 
+```
+
+#### Using `experimental-install`
+
+```console
+$ git clone https://github.com/giginet/swift-testing-revolutionary
+$ cd swift-testing-revolutionary
+$ swift package experimental-install
+```
+
+#### Using Artifact Bundle
+
+Download `swift-testing-revolutionary.artifactbundle.zip` from [Releases](https://github.com/giginet/swift-testing-revolutionary/releases) and unzip it.
 
 ## Options
 
@@ -93,10 +130,10 @@ See this article in [swift-testing](https://github.com/apple/swift-testing) docu
 
 Currently, this tool supports following conversions referred above documentation.
 
-- [x] Import statements of XCTest
-- [x] Test classes to structs
+- [x] Import statements of XCTest (`import XCTest`)
+- [x] Test classes to structs (`final class XXXTests: XCTestCase`)
 - [x] Setup and teardown functions (`setUp`, `tearDown`)
-- [x] Test methods
+- [x] Test methods `func testXXX()`
 - [x] Assertion functions (`XCTAssert~`)
 - [x] Check for optional values (`XCTUnwrap`)
 - [x] Record Issues (`XCTFail`)
@@ -106,3 +143,7 @@ Currently, this tool supports following conversions referred above documentation
 - [ ] Annotate known issues (`XCTExpectFailure`)
 
 Unsupported features have to be converted manually.
+
+## License
+
+MIT License
