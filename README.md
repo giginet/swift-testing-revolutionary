@@ -22,15 +22,15 @@ For Xcode project, it's better to use as a Xcode plugin.
 
 ### 2. Right click on your project root and select `RevolutionaryPlugin`.
 
-![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/run-plugin.png)
+<img src="./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/run-plugin.png" width=300px>
 
 ### 3. Choose the test target you want to convert.
 
-![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/choose-target.png)
+<img src="./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/choose-target.png" width=300px>
 
 ### 4. Allow change access if needed.
 
-![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/permission.png)
+<img src="./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/permission.png" width=300px>
 
 ### Package Command Plugin
 
