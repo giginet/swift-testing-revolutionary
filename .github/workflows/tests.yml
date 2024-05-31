@@ -7,17 +7,19 @@ on:
   pull_request:
     branches:
       - '*'
+
 jobs:
   Tests:
     strategy:
       matrix:
         xcode_version: ["15.3"]
     env: 
-      DEVELOPER_DIR: "/Applications/Xcode_${{ matrix.xcode_version }}.app/Contents/Developer"
+    DEVELOPER_DIR: "/Applications/Xcode_${{ matrix.xcode_version }}.app/Contents/Developer"
     runs-on: macos-14
-    - name: Get swift version
-      run: swift --version
-    - uses: actions/checkout@v2
-    - name: Run Tests
-      run: |
-        swift test
+    steps:
+      - name: Get swift version
+        run: swift --version
+      - uses: actions/checkout@v2
+      - name: Run Tests
+        run: |
+          swift test
