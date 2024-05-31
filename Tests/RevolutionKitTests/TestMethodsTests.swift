@@ -19,18 +19,18 @@ private let testCaseConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        @MainActor  @Test func example() {
+        @Test @MainActor func example() {
         }
         """
     ),
     .init(
         """
-        @MainActor
+        @MainActor 
         func testExample() {
         }
         """,
         """
-        @MainActor @Test 
+        @Test @MainActor 
         func example() {
         }
         """
