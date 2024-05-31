@@ -48,6 +48,8 @@ package struct Runner {
     
     @discardableResult
     func run<E: Emitter>(for sourceFile: URL, emitter: E) throws -> E.EmitType {
+        let fileName = sourceFile.lastPathComponent
+        print("Converting \(fileName)")
         guard let data = FileManager.default.contents(atPath: sourceFile.path()),
                 let sourceContents = String(data: data, encoding: .utf8) else {
             throw Error.unableToLoadSource(at: sourceFile)

@@ -9,10 +9,7 @@ struct SwiftTestingRevolutionaryPlugin: CommandPlugin {
     func performCommand(context: PackagePlugin.PluginContext, arguments: [String]) async throws {
         let revolutionaryExecutable = try context.tool(named: "swift-testing-revolutionary")
         
-        let allTestTargets = context.package.targets(ofType: SwiftSourceModuleTarget.self)
-            .filter { $0.kind == .test }
-        
-        let argumentsToExecute = arguments + allTestTargets.map { $0.directory.string }
+        let argumentsToExecute = arguments
         try performTool(executablePath: revolutionaryExecutable.path.url, arguments: argumentsToExecute)
     }
 }
