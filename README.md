@@ -9,6 +9,8 @@ swift-testing-revolutionary converts test cases written in XCTest to [swift-test
 
 This tool provides three ways to use. As an Xcode Plugin, as a Command Plugin, or as a command line tool.
 
+**In default, all test files will be overwritten unless you passed `--dry-run` flag. Please make sure to backup your test files before running this tool.**
+
 ### As Xcode Plugin
 
 For Xcode project, it's better to use as a Xcode plugin.
@@ -31,7 +33,7 @@ let package = Package(
 2. Run the plugin on your package
 
 ```console
-$ swift package plugin revolt --allow-writing-to-package-directory Tests/
+$ swift package plugin --allow-writing-to-package-directory swift-testing-revolutionary Tests
 ```
 
 ### As Command Line Tool

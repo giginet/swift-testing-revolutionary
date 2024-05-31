@@ -33,7 +33,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/apple/swift-argument-parser.git",
-            from: "1.3.0"
+            from: "1.2.0"
         ),
     ],
     targets: [
@@ -48,7 +48,7 @@ let package = Package(
             name: "RevolutionaryPlugin",
             capability: .command(
                 intent: .custom(
-                    verb: "revolt",
+                    verb: "swift-testing-revolutionary",
                     description: "Convert XCTest cases to swift-testing"
                 ),
                 permissions: [
