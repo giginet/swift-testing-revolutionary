@@ -1,5 +1,13 @@
 # swift-testing-revolutionary
 
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/giginet/swift-testing-revolutionary/tests.yml?style=flat-square&logo=github)
+![Swift 5.10](https://img.shields.io/badge/Swift-5.10-FA7343?logo=swift&style=flat-square)
+[![Xcode 15.4](https://img.shields.io/badge/Xcode-15.4-147EFB?style=flat-square&logo=xcode&link=https%3A%2F%2Fdeveloper.apple.com%2Fxcode%2F)](https://developer.apple.com/xcode/)
+[![SwiftPM](https://img.shields.io/badge/SwiftPM-compatible-green?logo=swift&style=flat-square)](https://swift.org/package-manager/) 
+![Platforms](https://img.shields.io/badge/Platform-macOS-lightgray?logo=apple&style=flat-square)
+[![License](https://img.shields.io/badge/License-MIT-darkgray?style=flat-square)
+](https://github.com/giginet/Scipio/blob/main/LICENSE.md)
+
 swift-testing-revolutionary converts test cases written in XCTest to [swift-testing](https://github.com/apple/swift-testing)
 
 ![](./Sources/swift-testing-revolutionary/swift-testing-revolutionary.docc/diff.png)
