@@ -1,0 +1,14 @@
+import Foundation
+import Testing
+
+struct ViewModelTests {
+    @MainActor @Test 
+    func updateMember() async throws {
+        
+    }
+    
+    @MainActor @Test 
+    func addMembers() async throws {
+
+    }
+}

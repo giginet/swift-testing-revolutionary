@@ -29,6 +29,7 @@ extension XCTestRewriter {
         }
         
         let testMacroAttribute = AttributeSyntax(
+            leadingTrivia: .space,
             attributeName: IdentifierTypeSyntax(
                 name: .identifier("Test")
             ),
@@ -37,10 +38,9 @@ extension XCTestRewriter {
         
         let attributes = {
             var attributes = node.attributes
-            attributes.insert(.attribute(testMacroAttribute), at: attributes.startIndex)
+            attributes.insert(.attribute(testMacroAttribute), at: attributes.endIndex)
             return attributes
                 .with(\.leadingTrivia, node.leadingTrivia)
-                .with(\.trailingTrivia, .space)
         }()
         
         let newSigniture = node
