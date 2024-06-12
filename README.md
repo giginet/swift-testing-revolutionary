@@ -127,7 +127,7 @@ func testProperty() { }
 
 // After
 @Test property() { } // Enabled (Default)
-@Test testProperty { } // Disabled
+@Test testProperty() { } // Disabled
 ```
 
 ## How to migrate tests for swift-testing
