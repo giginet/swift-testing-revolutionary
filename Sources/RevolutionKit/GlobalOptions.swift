@@ -1,7 +1,7 @@
 import Foundation
 
 /// Struct to contains the global options
-package struct GlobalOptions {
+package struct GlobalOptions: Sendable {
     /// Whether to run in dry-run mode
     var isDryRunMode: Bool
     
