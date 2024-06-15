@@ -126,8 +126,8 @@ In the default, all test methods would be stripped `test` prefix.
 func testProperty() { }
 
 // After
-@Test property() { } // Enabled (Default)
-@Test testProperty() { } // Disabled
+@Test func property() { } // Enabled (Default)
+@Test func testProperty() { } // Disabled
 ```
 
 ## How to migrate tests for swift-testing
