@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -25,11 +25,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/apple/swift-syntax.git",
-            .upToNextMajor(from: "510.0.1")
+            .upToNextMajor(from: "600.0.0-latest")
         ),
         .package(
             url: "https://github.com/apple/swift-testing.git",
-            from: "0.7.0"
+            from: "0.10.0"
         ),
         .package(
             url: "https://github.com/apple/swift-argument-parser.git",
@@ -73,5 +73,6 @@ let package = Package(
                 .product(name: "Testing", package: "swift-testing"),
             ]
         ),
-    ]
+    ],
+    swiftLanguageVersions: [.v6]
 )
