@@ -4,19 +4,9 @@ import SwiftParser
 
 package struct Runner {
     private let globalOptions: GlobalOptions
-    private let rewriter: SyntaxRewriter
     
     package init(globalOptions: GlobalOptions = .default) {
         self.globalOptions = globalOptions
-        self.rewriter = XCTestRewriter(globalOptions: globalOptions)
-    }
-    
-    init(
-        globalOptions: GlobalOptions = .default,
-        rewriter: SyntaxRewriter
-    ) {
-        self.globalOptions = globalOptions
-        self.rewriter = rewriter
     }
     
     package func run(for sources: [URL]) async throws {
@@ -60,6 +50,7 @@ package struct Runner {
     @discardableResult
     func run<E: Emitter>(for source: String, emitter: E) throws -> E.EmitType {
         let sourceFile = Parser.parse(source: source)
+        let rewriter = XCTestRewriter(globalOptions: globalOptions)
         let converted = rewriter.rewrite(sourceFile, detach: true)
         return try emitter.emit(converted)
     }

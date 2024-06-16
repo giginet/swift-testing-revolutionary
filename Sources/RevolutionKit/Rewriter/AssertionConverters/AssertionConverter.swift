@@ -1,7 +1,7 @@
 import Foundation
 import SwiftSyntax
 
-protocol AssertionConverter {
+protocol AssertionConverter: Sendable {
     /// The assertion function name in XCTest
     var xcTestAssertionName: String { get }
     
