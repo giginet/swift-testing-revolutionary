@@ -29,7 +29,6 @@ extension XCTestRewriter {
         }
         
         let testMacroAttribute = AttributeSyntax(
-            leadingTrivia: node.leadingTrivia,
             attributeName: IdentifierTypeSyntax(
                 name: .identifier("Test")
             ),
