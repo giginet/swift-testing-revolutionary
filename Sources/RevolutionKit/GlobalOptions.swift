@@ -11,6 +11,9 @@ package struct GlobalOptions: Sendable {
     /// Whether to enable to strip `test` prefixes of each test case
     var enableStrippingTestPrefix: Bool
     
+    /// Whether to add `@Suite` to each test class
+    var enableAddingSuite: Bool
+    
     package enum BackUpMode {
         case disabled
         case enabled(URL)
@@ -19,11 +22,13 @@ package struct GlobalOptions: Sendable {
     package init(
         isDryRunMode: Bool = false,
         enableStructConversion: Bool = true,
-        enableStrippingTestPrefix: Bool = true
+        enableStrippingTestPrefix: Bool = true,
+        enableAddingSuite: Bool = true
     ) {
         self.isDryRunMode = isDryRunMode
         self.enableStructConversion = enableStructConversion
         self.enableStrippingTestPrefix = enableStrippingTestPrefix
+        self.enableAddingSuite = enableAddingSuite
     }
 }
 

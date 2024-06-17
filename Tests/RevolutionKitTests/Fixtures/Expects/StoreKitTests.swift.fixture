@@ -3,7 +3,7 @@ import Testing
 import StoreKitTest
 @testable import MyApp
 
-struct StoreTests {
+@Suite struct StoreTests {
     private var testSession: SKTestSession!
     private let productionStore = ProductionStore()
     
