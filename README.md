@@ -100,6 +100,7 @@ You can pass some options to the command.
 | --dry-run                          | Run as a dry run mode. All test files are not overwritten    |         |
 | --enable/disable-struct-conversion | Whether converting test classes to structs or not            | Enabled |
 | --enable/disable-strip-test-prefix | Whether stripping `test` prefix from each test method or not | Enabled |
+| --enable/disable-adding-suite      | Whether adding `@Suite` annotation to each test class or not | Enabled |
 
 ### Struct Conversion
 
@@ -107,11 +108,11 @@ In the default, all test classes would be converted to structs.
 
 ```swift
 // Before
-class MyModelTests: XCTestCase { }
+final class MyModelTests: XCTestCase { }
 
 // After
-struct MyModelTests { } // Enabled (Default)
-class MyModelTests { } // Disabled
+@Suite struct MyModelTests { } // Enabled (Default)
+@Suite final class MyModelTests { } // Disabled
 ```
 
 #### Note
@@ -130,6 +131,19 @@ func testProperty() { }
 // After
 @Test func property() { } // Enabled (Default)
 @Test func testProperty() { } // Disabled
+```
+
+### Adding `@Suite`
+
+In the default, all test classes would be annotated with `@Suite`.
+
+```swift
+// Before
+final class MyModelTests: XCTestCase { }
+
+// After
+@Suite struct MyModelTests { } // Enabled (Default)
+struct MyModelTests { } // Disabled
 ```
 
 ## How to migrate tests for swift-testing

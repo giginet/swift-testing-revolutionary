@@ -9,7 +9,7 @@ private let structConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        struct HogeTests {
+        @Suite struct HogeTests {
         }
         """
     ),
@@ -19,7 +19,7 @@ private let structConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        struct HogeTests {
+        @Suite struct HogeTests {
         }
         """
     ),
@@ -29,7 +29,7 @@ private let structConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        struct HogeTests {
+        @Suite struct HogeTests {
         }
         """
     ),
@@ -52,7 +52,7 @@ private let classConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        final class HogeTests {
+        @Suite final class HogeTests {
         }
         """
     ),
@@ -62,7 +62,7 @@ private let classConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        class HogeTests {
+        @Suite class HogeTests {
         }
         """
     ),
@@ -72,7 +72,50 @@ private let classConversionFixtures: [ConversionTestFixture] = [
         }
         """,
         """
-        final class HogeTests {
+        @Suite final class HogeTests {
+        }
+        """
+    ),
+    .init(
+        """
+        final class NotATestClass {
+        }
+        """,
+        """
+        final class NotATestClass {
+        }
+        """
+    ),
+]
+
+private let structConversionFixturesWithoutSuite: [ConversionTestFixture] = [
+    .init(
+        """
+        final class HogeTests: XCTestCase {
+        }
+        """,
+        """
+        struct HogeTests {
+        }
+        """
+    ),
+    .init(
+        """
+        class HogeTests: XCTestCase {
+        }
+        """,
+        """
+        struct HogeTests {
+        }
+        """
+    ),
+    .init(
+        """
+        final class HogeTests: NoTest {
+        }
+        """,
+        """
+        struct HogeTests {
         }
         """
     ),
@@ -92,7 +135,7 @@ private let classConversionFixtures: [ConversionTestFixture] = [
     private let emitter = StringEmitter()
     
     @Test("TestClassRewriter can convert test class definitions to struct", arguments: structConversionFixtures)
-    private func rewriterCanConvertsToStruct(_ fixture: ConversionTestFixture) async throws {
+    private func rewriterCanConvertsToStructs(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
         
         let result = try runner.run(for: fixture.source, emitter: StringEmitter())
@@ -100,8 +143,16 @@ private let classConversionFixtures: [ConversionTestFixture] = [
     }
     
     @Test("TestClassRewriter can convert test class definitions to classes", arguments: classConversionFixtures)
-    private func rewriterCanConvertsToTests(_ fixture: ConversionTestFixture) async throws {
+    private func rewriterCanConvertsToClasses(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner(globalOptions: .init(enableStructConversion: false))
+        
+        let result = try runner.run(for: fixture.source, emitter: StringEmitter())
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
+    }
+    
+    @Test("TestClassRewriter can convert test class definitions to struct without @Suite", arguments: structConversionFixturesWithoutSuite)
+    private func rewriterCanConvertsToStructsWithoutSuite(_ fixture: ConversionTestFixture) async throws {
+        let runner = Runner(globalOptions: .init(enableAddingSuite: false))
         
         let result = try runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)

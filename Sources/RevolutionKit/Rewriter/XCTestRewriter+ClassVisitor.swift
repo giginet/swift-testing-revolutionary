@@ -8,10 +8,34 @@ extension XCTestRewriter {
             return super.visit(node)
         }
         
-        if shouldConvertToStruct {
-            return buildStruct(from: node)
+        let newNode: ClassDeclSyntax
+        if globalOptions.enableAddingSuite {
+            let suiteAttribute = AttributeSyntax(
+                attributeName: IdentifierTypeSyntax(
+                    name: .identifier("Suite")
+                ),
+                trailingTrivia: .space
+            )
+            
+            let newAttributes = {
+                var attributes = node.attributes
+                attributes.insert(.attribute(suiteAttribute), at: node.attributes.startIndex)
+                return attributes
+            }()
+            
+            newNode = node
+                .with(\.attributes,
+                       newAttributes
+                    .with(\.leadingTrivia, node.leadingTrivia)
+                )
         } else {
-            return buildSwiftTestingClass(from: node)
+            newNode = node
+        }
+        
+        if shouldConvertToStruct {
+            return buildStruct(from: newNode)
+        } else {
+            return buildSwiftTestingClass(from: newNode)
         }
     }
     
@@ -31,7 +55,11 @@ extension XCTestRewriter {
     private func buildStruct(from node: ClassDeclSyntax) -> DeclSyntax {
         // We can't convert ClassDecl to StructDecl, so we just replace some parameters instead.
         let newNode = node
-            .with(\.classKeyword, .keyword(.struct, leadingTrivia: node.leadingTrivia, trailingTrivia: .spaces(1)))
+            .with(\.classKeyword, .keyword(
+                .struct,
+                leadingTrivia: node.classKeyword.leadingTrivia, 
+                trailingTrivia: .space)
+            )
             .with(\.modifiers, []) // get rid of 'final' keyword
             .with(\.inheritanceClause, InheritanceClauseSyntax(
                 colon: .unknown(""),
