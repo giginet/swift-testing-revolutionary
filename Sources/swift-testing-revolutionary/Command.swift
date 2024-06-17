@@ -16,6 +16,9 @@ struct SwiftTestingRevolutionaryCommand: AsyncParsableCommand {
     @Flag(inversion: .prefixedEnableDisable, help: "Whether stripping `test` prefix from each test method or not")
     var stripTestPrefix: Bool = true
     
+    @Flag(inversion: .prefixedEnableDisable, help: "Whether adding `@Suite` to each test class")
+    var addingSuite: Bool = true
+    
     func run() async throws {
         let options = buildRunnerOptions()
         
@@ -29,7 +32,8 @@ struct SwiftTestingRevolutionaryCommand: AsyncParsableCommand {
         return .init(
             isDryRunMode: dryRun,
             enableStructConversion: structConversion,
-            enableStrippingTestPrefix: stripTestPrefix
+            enableStrippingTestPrefix: stripTestPrefix,
+            enableAddingSuite: addingSuite
         )
     }
 }
