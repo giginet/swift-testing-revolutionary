@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-struct ConversionTestFixture {
+struct ConversionTestFixture: CustomTestStringConvertible {
     let source: String
     let expected: String
     let sourceLocation: SourceLocation
@@ -15,5 +15,9 @@ struct ConversionTestFixture {
     enum Expected {
         case identical
         case converted(String)
+    }
+    
+    var testDescription: String {
+        self.source
     }
 }

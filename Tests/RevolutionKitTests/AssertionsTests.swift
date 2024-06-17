@@ -283,6 +283,7 @@ let fixturesWithSourceLocations: [ConversionTestFixture] = [
     ),
 ]
 
+@Suite("Tests rewrite all assertions")
 struct AssertionsTests {
     private let emitter = StringEmitter()
     

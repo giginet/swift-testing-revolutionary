@@ -164,7 +164,7 @@ private let tearDownConversionFixtures: [ConversionTestFixture] = [
     ),
 ]
 
-struct TestMethodsTests {
+@Suite struct TestMethodsTests {
     private let emitter = StringEmitter()
     
     @Test("TestMethodsRewriter can convert test cases", arguments: testCaseConversionFixtures)

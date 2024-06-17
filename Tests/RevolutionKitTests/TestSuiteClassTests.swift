@@ -88,7 +88,7 @@ private let classConversionFixtures: [ConversionTestFixture] = [
     ),
 ]
 
-struct TestSuiteClassTests {
+@Suite struct TestSuiteClassTests {
     private let emitter = StringEmitter()
     
     @Test("TestClassRewriter can convert test class definitions to struct", arguments: structConversionFixtures)
