@@ -2,6 +2,7 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
 
 let package = Package(
     name: "swift-testing-revolutionary",
@@ -76,3 +77,11 @@ let package = Package(
     ],
     swiftLanguageVersions: [.v6]
 )
+
+let isDevelopment = ProcessInfo.processInfo.environment["SWIFT_TESTING_REVOLUTIONARY_DEVELOPMENT"] == "1"
+
+if isDevelopment {
+    package.dependencies += [
+        .package(url: "https://github.com/freddi-kit/ArtifactBundleGen.git", from: "0.0.6"),
+    ]
+}
