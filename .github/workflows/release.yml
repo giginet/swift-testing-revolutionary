@@ -1,0 +1,35 @@
+on: 
+  release:
+    types: [created]
+
+name: Upload Artifact Bundle to Release
+env: 
+  DEVELOPER_DIR: "/Applications/Xcode_15.3.app/Contents/Developer"
+  SWIFT_TESTING_REVOLUTIONARY_DEVELOPMENT: 1
+
+jobs:
+  release:
+    name: Build and Upload Artifact Bundle
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v3
+      - name: Resolve Dependencies
+        run: |
+          swift package resolve
+      - name: Build Binary
+        run: |
+          swift build --disable-sandbox -c release --arch arm64 --arch x86_64 --target swift-testing-revolutionary
+      - name: Get Current Tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Make Artifact Bundle
+        run: |
+          swift package --allow-writing-to-package-directory generate-artifact-bundle \
+          --package-version ${{ env.TAG_NAME }} \
+          --executable-name swift-testing-revolutionary \
+          --build-config release \
+          --build-folder .build
+      - name: Upload Artifact Bundle to Release
+        run: |
+          gh release upload ${{ env.TAG_NAME }} ./swift-testing-revolutionary.artifactbundle.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
