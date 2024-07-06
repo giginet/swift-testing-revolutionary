@@ -63,4 +63,10 @@ extension Path {
     }
 }
 
+extension PluginContext.Tool {
+    fileprivate var url: URL {
+        path.url
+    }
+}
+
 #endif
