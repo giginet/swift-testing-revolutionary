@@ -10,7 +10,7 @@ struct SwiftTestingRevolutionaryPlugin: CommandPlugin {
         let revolutionaryExecutable = try context.tool(named: "swift-testing-revolutionary")
         
         let argumentsToExecute = arguments
-        try performTool(executablePath: revolutionaryExecutable.path.url, arguments: argumentsToExecute)
+        try performTool(executablePath: revolutionaryExecutable.url, arguments: argumentsToExecute)
     }
 }
 
@@ -29,12 +29,12 @@ extension SwiftTestingRevolutionaryPlugin: XcodeCommandPlugin {
             }
             
             let allTestFiles = target.inputFiles
-                .filter { $0.path.lastComponent.hasSuffix("Tests.swift") }
+                .filter { $0.url.lastPathComponent.hasSuffix("Tests.swift") }
             return files + allTestFiles
         }
         
-        let argumentsToExecute = extractor.remainingArguments + allTestFiles.map { $0.path.string }
-        try performTool(executablePath: revolutionaryExecutable.path.url, arguments: argumentsToExecute)
+        let argumentsToExecute = extractor.remainingArguments + allTestFiles.map { $0.url.path() }
+        try performTool(executablePath: revolutionaryExecutable.url, arguments: argumentsToExecute)
     }
 }
 
@@ -55,8 +55,18 @@ private func performTool(executablePath: URL, arguments: [String]) throws {
     }
 }
 
+#if compiler(<6.0)
+
 extension Path {
     fileprivate var url: URL {
         URL(filePath: string)
     }
 }
+
+extension PluginContext.Tool {
+    fileprivate var url: URL {
+        path.url
+    }
+}
+
+#endif
