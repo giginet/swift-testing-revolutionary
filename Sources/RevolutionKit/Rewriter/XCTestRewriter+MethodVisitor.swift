@@ -4,6 +4,7 @@ import SwiftSyntax
 /// Visitor to rewrite XCTest's test methods to swift-testing.
 extension XCTestRewriter {
     func visitForTestFunctionDecl(_ node: FunctionDeclSyntax) -> DeclSyntax {
+        guard !node.hasTestMacroAttribute else { return super.visit(node) }
         guard let methodKind = detectMethodKind(of: node) else {
             return super.visit(node)
         }
@@ -18,15 +19,17 @@ extension XCTestRewriter {
         }
     }
     
+    private var testMethodNameConverter: TestMethodNameConverter {
+        TestMethodNameConverter(
+            shouldStripPrefix: globalOptions.enableStrippingTestPrefix
+        )
+    }
+    
     /// Rewrite XCTest test case methods to swift-testing
     /// func testExample() -> @Test func example()
     private func rewriteTestCase(node: FunctionDeclSyntax) -> DeclSyntax {
         let testCaseName = node.name.text
-        let newTestCaseName = if globalOptions.enableStrippingTestPrefix {
-            strippingTestPrefix(of: testCaseName)
-        } else {
-            testCaseName
-        }
+        let newTestCaseName = testMethodNameConverter.convert(testCaseName)
         
         let testMacroAttribute = AttributeSyntax(
             attributeName: IdentifierTypeSyntax(
@@ -91,24 +94,6 @@ extension XCTestRewriter {
         return DeclSyntax(deinitializerDecl)
     }
     
-    /// Strip first `test` prefix from test case names.
-    /// `testCamelCase` -> `camelCase`
-    /// `test` -> `test`
-    private func strippingTestPrefix(of testCaseName: String) -> String {
-        precondition(testCaseName.hasPrefix("test"))
-        
-        return {
-            var convertedName = testCaseName
-            convertedName.removeFirst(4)
-            
-            guard let firstCharacter = convertedName.first else {
-                return testCaseName
-            }
-            
-            return firstCharacter.lowercased() + convertedName.dropFirst()
-        }()
-    }
-    
     /// Returns a kind of the method
     private func detectMethodKind(of node: FunctionDeclSyntax) -> MethodKind? {
         guard !isStaticMethod(node: node) else { return nil }
@@ -150,5 +135,18 @@ extension XCTestRewriter {
         case testCase(String)
         case setUp
         case tearDown
+    }
+}
+
+extension FunctionDeclSyntax {
+    fileprivate var hasTestMacroAttribute: Bool {
+        attributes.contains { attribute in
+            switch attribute {
+            case .attribute(let attributeNode):
+                let attributeName = attributeNode.attributeName.as(IdentifierTypeSyntax.self)?.name
+                return attributeName?.tokenKind == .identifier("Test")
+            case .ifConfigDecl: return false
+            }
+        }
     }
 }
