@@ -4,6 +4,7 @@ import SwiftSyntax
 /// Visitor to rewrite XCTest's test methods to swift-testing.
 extension XCTestRewriter {
     func visitForTestFunctionDecl(_ node: FunctionDeclSyntax) -> DeclSyntax {
+        guard !node.hasTestMacroAttribute else { return super.visit(node) }
         guard let methodKind = detectMethodKind(of: node) else {
             return super.visit(node)
         }
@@ -150,5 +151,18 @@ extension XCTestRewriter {
         case testCase(String)
         case setUp
         case tearDown
+    }
+}
+
+extension FunctionDeclSyntax {
+    fileprivate var hasTestMacroAttribute: Bool {
+        attributes.contains { attribute in
+            switch attribute {
+            case .attribute(let attributeNode):
+                let attributeName = attributeNode.attributeName.as(IdentifierTypeSyntax.self)?.name
+                return attributeName?.tokenKind == .identifier("Test")
+            case .ifConfigDecl: return false
+            }
+        }
     }
 }
