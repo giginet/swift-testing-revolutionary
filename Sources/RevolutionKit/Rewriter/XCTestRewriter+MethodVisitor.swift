@@ -19,15 +19,17 @@ extension XCTestRewriter {
         }
     }
     
+    private var testMethodNameConverter: TestMethodNameConverter {
+        TestMethodNameConverter(
+            shouldStripPrefix: globalOptions.enableStrippingTestPrefix
+        )
+    }
+    
     /// Rewrite XCTest test case methods to swift-testing
     /// func testExample() -> @Test func example()
     private func rewriteTestCase(node: FunctionDeclSyntax) -> DeclSyntax {
         let testCaseName = node.name.text
-        let newTestCaseName = if globalOptions.enableStrippingTestPrefix {
-            strippingTestPrefix(of: testCaseName)
-        } else {
-            testCaseName
-        }
+        let newTestCaseName = testMethodNameConverter.convert(testCaseName)
         
         let testMacroAttribute = AttributeSyntax(
             attributeName: IdentifierTypeSyntax(
@@ -90,24 +92,6 @@ extension XCTestRewriter {
         )
         
         return DeclSyntax(deinitializerDecl)
-    }
-    
-    /// Strip first `test` prefix from test case names.
-    /// `testCamelCase` -> `camelCase`
-    /// `test` -> `test`
-    private func strippingTestPrefix(of testCaseName: String) -> String {
-        precondition(testCaseName.hasPrefix("test"))
-        
-        return {
-            var convertedName = testCaseName
-            convertedName.removeFirst(4)
-            
-            guard let firstCharacter = convertedName.first else {
-                return testCaseName
-            }
-            
-            return firstCharacter.lowercased() + convertedName.dropFirst()
-        }()
     }
     
     /// Returns a kind of the method
