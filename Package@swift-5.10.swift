@@ -24,7 +24,7 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/apple/swift-syntax.git",
+            url: "https://github.com/swiftlang/swift-syntax.git",
             .upToNextMajor(from: "510.0.1")
         ),
         .package(
