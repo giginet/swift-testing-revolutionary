@@ -18,7 +18,7 @@ jobs:
           swift package resolve
       - name: Build Binary
         run: |
-          swift build --disable-sandbox -c release --arch arm64 --arch x86_64 --target swift-testing-revolutionary
+          swift build --disable-sandbox -c release --arch arm64 --arch x86_64 --product swift-testing-revolutionary
       - name: Get Current Tag
         run: echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Make Artifact Bundle
