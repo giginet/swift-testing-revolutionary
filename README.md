@@ -162,7 +162,7 @@ struct MyModelTests { } // Disabled
 
 See this article in [swift-testing](https://github.com/apple/swift-testing) documentation.
 
-[Migrating a test from XCTest | Documentation](https://swiftpackageindex.com/apple/swift-testing/main/documentation/testing/migratingfromxctest)
+[Migrating a test from XCTest | Apple Developer Documentation](https://developer.apple.com/documentation/testing/migratingfromxctest)
 
 ## Supporting Conversions
 
