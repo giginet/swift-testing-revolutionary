@@ -19,8 +19,6 @@ swift-testing-revolutionary converts test cases written in XCTest to [swift-test
 
 This tool provides three ways to use. As an Xcode Plugin, as a Command Plugin, or as a command line tool.
 
-**In default, all test files will be overwritten unless you passed `--dry-run` flag. Please make sure to backup your test files before running this tool.**
-
 We provide three ways to use this tool.
 
 |Installation Methods|Good for|Convenience|Customization|
@@ -28,6 +26,9 @@ We provide three ways to use this tool.
 |Xcode Plugin|Xcode projects|✅|❌|
 |Package Command Plugin|Swift packages|✅|✅|
 |Command Line Tool|Any projects|❌|✅|
+
+> [!CAUTION]
+> In default, all test files will be overwritten unless you passed `--dry-run` flag. Please make sure to backup your test files before running this tool.**
 
 ### Xcode Plugin
 
@@ -99,7 +100,8 @@ $ swift package experimental-install
 
 Download `swift-testing-revolutionary.artifactbundle.zip` from [Releases](https://github.com/giginet/swift-testing-revolutionary/releases) and unzip it.
 
-> [!TIP] You can easily use artifactbundles with [mtj0928/nest](https://github.com/mtj0928/nest).
+> [!TIP]
+> You can easily use artifactbundles with [mtj0928/nest](https://github.com/mtj0928/nest).
 
 ## Options
 
