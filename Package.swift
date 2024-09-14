@@ -26,7 +26,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            .upToNextMajor(from: "600.0.0-latest")
+            .upToNextMajor(from: "600.0.0")
         ),
         .package(
             url: "https://github.com/apple/swift-testing.git",
@@ -75,7 +75,7 @@ let package = Package(
             ]
         ),
     ],
-    swiftLanguageVersions: [.v6]
+    swiftLanguageModes: [.v6]
 )
 
 let isDevelopment = ProcessInfo.processInfo.environment["SWIFT_TESTING_REVOLUTIONARY_DEVELOPMENT"] == "1"
