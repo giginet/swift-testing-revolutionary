@@ -3,7 +3,7 @@
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/giginet/swift-testing-revolutionary/tests.yml?style=flat-square&logo=github)](https://github.com/giginet/swift-testing-revolutionary/actions/workflows/tests.yml)
 ![Swift 6.0](https://img.shields.io/badge/Swift-6.0-FA7343?logo=swift&style=flat-square)
 ![Swift 5.10](https://img.shields.io/badge/Swift-5.10-FA7343?logo=swift&style=flat-square)
-[![Xcode 16.0 Beta](https://img.shields.io/badge/Xcode-16.0%20Beta-147EFB?style=flat-square&logo=xcode&link=https%3A%2F%2Fdeveloper.apple.com%2Fxcode%2F)](https://developer.apple.com/xcode/)
+[![Xcode 16.0](https://img.shields.io/badge/Xcode-16.0?style=flat-square&logo=xcode&link=https%3A%2F%2Fdeveloper.apple.com%2Fxcode%2F)](https://developer.apple.com/xcode/)
 [![Xcode 15.4](https://img.shields.io/badge/Xcode-15.4-147EFB?style=flat-square&logo=xcode&link=https%3A%2F%2Fdeveloper.apple.com%2Fxcode%2F)](https://developer.apple.com/xcode/)
 [![SwiftPM](https://img.shields.io/badge/SwiftPM-compatible-green?logo=swift&style=flat-square)](https://swift.org/package-manager/) 
 ![Platforms](https://img.shields.io/badge/Platform-macOS-lightgray?logo=apple&style=flat-square)
@@ -20,6 +20,14 @@ swift-testing-revolutionary converts test cases written in XCTest to [swift-test
 This tool provides three ways to use. As an Xcode Plugin, as a Command Plugin, or as a command line tool.
 
 **In default, all test files will be overwritten unless you passed `--dry-run` flag. Please make sure to backup your test files before running this tool.**
+
+We provide three ways to use this tool.
+
+|Installation Methods|Good for|Convenience|Customization|
+|---|--------|-----------|-------------|
+|Xcode Plugin|Xcode projects|✅|❌|
+|Package Command Plugin|Swift packages|✅|✅|
+|Command Line Tool|Any projects|❌|✅|
 
 ### Xcode Plugin
 
@@ -90,6 +98,8 @@ $ swift package experimental-install
 #### Using Artifact Bundle
 
 Download `swift-testing-revolutionary.artifactbundle.zip` from [Releases](https://github.com/giginet/swift-testing-revolutionary/releases) and unzip it.
+
+> [!TIP] You can easily use artifactbundles with [mtj0928/nest](https://github.com/mtj0928/nest).
 
 ## Options
 
