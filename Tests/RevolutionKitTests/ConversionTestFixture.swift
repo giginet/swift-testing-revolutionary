@@ -6,10 +6,10 @@ struct ConversionTestFixture: CustomTestStringConvertible {
     let expected: String
     let sourceLocation: SourceLocation
     
-    init(_ source: String, _ expected: String, _ line: UInt = #line) {
+    init(_ source: String, _ expected: String, _ sourceLocation: SourceLocation = #_sourceLocation) {
         self.source = source
         self.expected = expected
-        self.sourceLocation = SourceLocation(line: Int(line))
+        self.sourceLocation = sourceLocation
     }
     
     enum Expected {
