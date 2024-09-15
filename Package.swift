@@ -29,10 +29,6 @@ let package = Package(
             .upToNextMajor(from: "600.0.0")
         ),
         .package(
-            url: "https://github.com/apple/swift-testing.git",
-            from: "0.10.0"
-        ),
-        .package(
             url: "https://github.com/apple/swift-argument-parser.git",
             from: "1.2.0"
         ),
@@ -71,7 +67,6 @@ let package = Package(
             name: "RevolutionKitTests",
             dependencies: [
                 .target(name: "RevolutionKit"),
-                .product(name: "Testing", package: "swift-testing"),
             ]
         ),
     ],
