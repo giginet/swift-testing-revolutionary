@@ -23,3 +23,22 @@ struct ConversionTestFixture: CustomTestStringConvertible {
         self.fileName ?? self.source
     }
 }
+
+@resultBuilder
+struct FixtureBuilder {
+    public static func buildBlock(sourceLocation: SourceLocation = #_sourceLocation, _ source: String, _ expected: String) -> (String, String, SourceLocation) {
+        (source, expected, sourceLocation)
+    }
+}
+
+typealias Fixture = ConversionTestFixture
+
+extension Fixture {
+    init(@FixtureBuilder fixture: () -> (String, String, SourceLocation)) {
+        let parameters = fixture()
+        self.source = parameters.0
+        self.expected = parameters.1
+        self.sourceLocation = parameters.2
+        self.fileName = nil
+    }
+}
