@@ -54,19 +54,3 @@ private func performTool(executablePath: URL, arguments: [String]) throws {
         print("Converting all test files is succeeded")
     }
 }
-
-#if compiler(<6.0)
-
-extension Path {
-    fileprivate var url: URL {
-        URL(filePath: string)
-    }
-}
-
-extension PluginContext.Tool {
-    fileprivate var url: URL {
-        path.url
-    }
-}
-
-#endif
