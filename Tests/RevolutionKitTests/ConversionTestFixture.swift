@@ -2,14 +2,16 @@ import Foundation
 import Testing
 
 struct ConversionTestFixture: CustomTestStringConvertible {
+    let fileName: String?
     let source: String
     let expected: String
     let sourceLocation: SourceLocation
     
-    init(_ source: String, _ expected: String, _ sourceLocation: SourceLocation = #_sourceLocation) {
+    init(_ source: String, _ expected: String, _ sourceLocation: SourceLocation = #_sourceLocation, fileName: String? = nil) {
         self.source = source
         self.expected = expected
         self.sourceLocation = sourceLocation
+        self.fileName = fileName
     }
     
     enum Expected {
@@ -18,6 +20,6 @@ struct ConversionTestFixture: CustomTestStringConvertible {
     }
     
     var testDescription: String {
-        self.source
+        self.fileName ?? self.source
     }
 }
