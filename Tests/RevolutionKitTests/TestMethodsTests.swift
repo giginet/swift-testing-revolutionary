@@ -3,185 +3,185 @@ import Testing
 @testable import RevolutionKit
 
 private let testCaseConversionFixtures: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         func testExample() {
         }
-        """,
+        """
         """
         @Test func example() {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         func test_do_something() {
         }
-        """,
+        """
         """
         @Test func do_something() {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         func test() {
         }
-        """,
+        """
         """
         @Test func test() {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         @MainActor func testExample() {
         }
-        """,
+        """
         """
         @Test @MainActor func example() {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         @MainActor 
         func testExample() {
         }
-        """,
+        """
         """
         @Test @MainActor 
         func example() {
         }
         """
-    ),
+    },
 
-    .init(
-        """
-        static func testExample() {
-        }
-        """,
+    Fixture {
         """
         static func testExample() {
         }
         """
-    ),
-    .init(
+        """
+        static func testExample() {
+        }
+        """
+    },
+    Fixture {
         """
         func notTest() {
         }
-        """,
+        """
         """
         func notTest() {
         }
         """
-    ),
+    },
 ]
 
 private let setUpConversionFixtures: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         func setUp() {
         }
-        """,
+        """
         """
         init() {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         func setUp() async throws {
         }
-        """,
+        """
         """
         init() async throws {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         @MainActor func setUp() async throws {
         }
-        """,
+        """
         """
         @MainActor init() async throws {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         func setUpWithError() throws {
         }
-        """,
+        """
         """
         init() throws {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         override func setUp() {
         }
-        """,
+        """
         """
         init() {
         }
         """
-    ),
-    .init(
-        """
-        static func setUp() {
-        }
-        """,
+    },
+    Fixture {
         """
         static func setUp() {
         }
         """
-    ),
+        """
+        static func setUp() {
+        }
+        """
+    },
 ]
 
 private let tearDownConversionFixtures: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         func tearDown() {
         }
-        """,
+        """
         """
         deinit {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         func tearDown() async throws {
         }
-        """,
+        """
         """
         deinit {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         override func tearDown() async throws {
         }
-        """,
+        """
         """
         deinit {
         }
         """
-    ),
-    .init(
-        """
-        static func tearDown() {
-        }
-        """,
+    },
+    Fixture {
         """
         static func tearDown() {
         }
         """
-    ),
+        """
+        static func tearDown() {
+        }
+        """
+    },
 ]
 
 @Suite struct TestMethodsTests {

@@ -3,132 +3,132 @@ import Testing
 @testable import RevolutionKit
 
 private let structConversionFixtures: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         final class HogeTests: XCTestCase {
         }
-        """,
+        """
         """
         @Suite struct HogeTests {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         class HogeTests: XCTestCase {
         }
-        """,
+        """
         """
         @Suite struct HogeTests {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         final class HogeTests: NoTest {
         }
-        """,
+        """
         """
         @Suite struct HogeTests {
         }
         """
-    ),
-    .init(
-        """
-        final class NotATestClass {
-        }
-        """,
+    },
+    Fixture {
         """
         final class NotATestClass {
         }
         """
-    ),
+        """
+        final class NotATestClass {
+        }
+        """
+    },
 ]
 
 private let classConversionFixtures: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         final class HogeTests: XCTestCase {
         }
-        """,
+        """
         """
         @Suite final class HogeTests {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         class HogeTests: XCTestCase {
         }
-        """,
+        """
         """
         @Suite class HogeTests {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         final class HogeTests: NoTest {
         }
-        """,
+        """
         """
         @Suite final class HogeTests {
         }
         """
-    ),
-    .init(
-        """
-        final class NotATestClass {
-        }
-        """,
+    },
+    Fixture {
         """
         final class NotATestClass {
         }
         """
-    ),
+        """
+        final class NotATestClass {
+        }
+        """
+    },
 ]
 
 private let structConversionFixturesWithoutSuite: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         final class HogeTests: XCTestCase {
         }
-        """,
+        """
         """
         struct HogeTests {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         class HogeTests: XCTestCase {
         }
-        """,
+        """
         """
         struct HogeTests {
         }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         final class HogeTests: NoTest {
         }
-        """,
+        """
         """
         struct HogeTests {
         }
         """
-    ),
-    .init(
-        """
-        final class NotATestClass {
-        }
-        """,
+    },
+    Fixture {
         """
         final class NotATestClass {
         }
         """
-    ),
+        """
+        final class NotATestClass {
+        }
+        """
+    },
 ]
 
 @Suite struct TestSuiteClassTests {
