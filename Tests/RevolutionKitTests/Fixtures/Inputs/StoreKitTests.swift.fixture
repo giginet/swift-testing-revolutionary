@@ -21,7 +21,7 @@ final class StoreTests: XCTestCase {
         XCTAssertFalse(productionStore.isPremiumPlan)
         
         let _ = try await productionStore.purchase()
-        XCTAssertTrue(productionStore.isPremiumPlan)
+        XCTAssertTrue(productionStore.isPremiumPlan, "Can purchase premium plan")
     }
     
     func testEnabledPremiumPlanIfNonRenewableIsAlreadyPurchased() async throws {

@@ -21,7 +21,7 @@ import StoreKitTest
         #expect(!productionStore.isPremiumPlan)
         
         let _ = try await productionStore.purchase()
-        #expect(productionStore.isPremiumPlan)
+        #expect(productionStore.isPremiumPlan, "Can purchase premium plan")
     }
     
     @Test func enabledPremiumPlanIfNonRenewableIsAlreadyPurchased() async throws {
