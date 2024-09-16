@@ -3,284 +3,284 @@ import Testing
 @testable import RevolutionKit
 
 private let fixtures: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         XCTAssertEqual(
             1 + 1,
             2
         )
-        """,
+        """
         """
         #expect(
             1 + 1 == 2
         )
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssert(isValid)
-        """,
+        """
         """
         #expect(isValid)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertTrue(isValid)
-        """,
+        """
         """
         #expect(isValid)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertFalse(isValid)
-        """,
+        """
         """
         #expect(!isValid)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertEqual(1 + 1, 2)
-        """,
+        """
         """
         #expect(1 + 1 == 2)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNotEqual(1 + 1, 3)
-        """,
+        """
         """
         #expect(1 + 1 != 3)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertIdentical(value0, value1)
-        """,
+        """
         """
         #expect(value0 === value1)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNotIdentical(value0, value1)
-        """,
+        """
         """
         #expect(value0 !== value1)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertGreaterThan(value0, value1)
-        """,
+        """
         """
         #expect(value0 > value1)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertGreaterThanOrEqual(value0, value1)
-        """,
+        """
         """
         #expect(value0 >= value1)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertLessThanOrEqual(value0, value1)
-        """,
+        """
         """
         #expect(value0 <= value1)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertLessThan(value0, value1)
-        """,
+        """
         """
         #expect(value0 < value1)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNil(value)
-        """,
+        """
         """
         #expect(value == nil)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNotNil(value)
-        """,
+        """
         """
         #expect(value != nil)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         try XCTUnwrap(value)
-        """,
+        """
         """
         try #require(value)
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTFail("error")
-        """,
+        """
         """
         Issue.record("error")
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertThrowsError(try f())
-        """,
+        """
         """
         #expect(throws: (any Error).self) { try f() }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNoThrow(try f())
-        """,
+        """
         """
         #expect(throws: Never.self) { try f() }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertThrowsError(try f()) { error in _ }
-        """,
+        """
         """
         #expect { try f() } throws: { error in _ }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssert(isValid, "value should be true")
-        """,
+        """
         """
         #expect(isValid, "value should be true")
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertTrue(isValid, "value should be true")
-        """,
+        """
         """
         #expect(isValid, "value should be true")
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertFalse(isValid, "value should be false")
-        """,
+        """
         """
         #expect(!isValid, "value should be false")
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertEqual(1 + 1, 2, "value should be 2")
-        """,
+        """
         """
         #expect(1 + 1 == 2, "value should be 2")
         """
-    ),
+    },
 ]
 
 let fixturesWithSourceLocations: [ConversionTestFixture] = [
-    .init(
+    Fixture {
         """
         XCTAssertTrue(isValid, "value should be true", line: 42)
-        """,
+        """
         """
         #expect(isValid, "value should be true", sourceLocation: SourceLocation(line: 42))
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertTrue(
           isValid,
           line: 42
         )
-        """,
+        """
         """
         #expect(
           isValid,sourceLocation: SourceLocation(
           line: 42)
         )
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertTrue(isValid, "value should be true", file: #file)
-        """,
+        """
         """
         #expect(isValid, "value should be true", sourceLocation: SourceLocation(file: #file))
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertEqual(1 + 1, 2, "value should be 2", file: #file, line: 42)
-        """,
+        """
         """
         #expect(1 + 1 == 2, "value should be 2", sourceLocation: SourceLocation(file: #file, line: 42))
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNil(value, "value should be 2", file: #file, line: 42)
-        """,
+        """
         """
         #expect(value == nil, "value should be 2", sourceLocation: SourceLocation(file: #file, line: 42))
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTUnwrap(value, "value can be unwrapped", file: #file, line: 42)
-        """,
+        """
         """
         #require(value, "value can be unwrapped", sourceLocation: SourceLocation(file: #file, line: 42))
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertThrowsError(try f(), "f() should raise error", file: #file, line: 42)
-        """,
+        """
         """
         #expect(throws: (any Error).self, "f() should raise error", sourceLocation: SourceLocation(file: #file, line: 42)) { try f() }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertThrowsError(try f(), "f() should raise error", file: #file, line: 42) { error in }
-        """,
+        """
         """
         #expect("f() should raise error", sourceLocation: SourceLocation(file: #file, line: 42)) { try f() } throws: { error in }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTAssertNoThrow(try f(), "f() should raise error", file: #file, line: 42)
-        """,
+        """
         """
         #expect(throws: Never.self, "f() should raise error", sourceLocation: SourceLocation(file: #file, line: 42)) { try f() }
         """
-    ),
-    .init(
+    },
+    Fixture {
         """
         XCTFail("error", file: #file, line: 42)
-        """,
+        """
         """
         Issue.record("error", file: #file, line: 42)
         """
-    ),
+    },
 ]
 
 @Suite("Tests rewrite all assertions")

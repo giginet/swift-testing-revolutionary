@@ -1,5 +1,5 @@
 {
-  "originHash" : "08b7f562030c50b0845a8fa4260a424c9a13d99115aad21c8e2165815e354c4b",
+  "originHash" : "2992d5354881d2641db22fe79b2fed3ae338628c4d56f13d9ae1200d617c4e04",
   "pins" : [
     {
       "identity" : "swift-argument-parser",
@@ -17,15 +17,6 @@
       "state" : {
         "revision" : "cb53fa1bd3219b0b23ded7dfdd3b2baff266fd25",
         "version" : "600.0.0"
-      }
-    },
-    {
-      "identity" : "swift-testing",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-testing.git",
-      "state" : {
-        "revision" : "c55848b2aa4b29a4df542b235dfdd792a6fbe341",
-        "version" : "0.12.0"
       }
     }
   ],

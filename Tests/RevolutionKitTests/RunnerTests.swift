@@ -38,7 +38,8 @@ private enum FixtureLoader {
             
             return ConversionTestFixture(
                 inputFileString,
-                expectFileString
+                expectFileString,
+                fileName: fileName
             )
         }
         .compactMap { $0 }
