@@ -131,6 +131,33 @@ private let structConversionFixturesWithoutSuite: [ConversionTestFixture] = [
     },
 ]
 
+private let attributesOnTopOfDeclaration: [ConversionTestFixture] = [
+    Fixture {
+        """
+        class HogeTests: XCTestCase {
+        }
+        """
+        """
+        @Suite
+        struct HogeTests {
+        }
+        """
+    },
+    Fixture {
+        """
+        @ExistingAttribute
+        class HogeTests: XCTestCase {
+        }
+        """
+        """
+        @Suite
+        @ExistingAttribute
+        struct HogeTests {
+        }
+        """
+    },
+]
+
 @Suite struct TestSuiteClassTests {
     private let emitter = StringEmitter()
     
@@ -153,6 +180,14 @@ private let structConversionFixturesWithoutSuite: [ConversionTestFixture] = [
     @Test("TestClassRewriter can convert test class definitions to struct without @Suite", arguments: structConversionFixturesWithoutSuite)
     private func rewriterCanConvertsToStructsWithoutSuite(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner(globalOptions: .init(enableAddingSuite: false))
+        
+        let result = try runner.run(for: fixture.source, emitter: StringEmitter())
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
+    }
+    
+    @Test("TestClassRewriter can put attributes on top of the declaration", arguments: attributesOnTopOfDeclaration)
+    private func rewriterCanPutAttributesOnTopOfDeclaration(_ fixture: ConversionTestFixture) async throws {
+        let runner = Runner(globalOptions: .init(attributesOnSameLine: false))
         
         let result = try runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)

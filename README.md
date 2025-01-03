@@ -105,12 +105,13 @@ Download `swift-testing-revolutionary.artifactbundle.zip` from [Releases](https:
 
 You can pass some options to the command.  
 
-| Option                             | Description                                                  | Default |
-|------------------------------------|--------------------------------------------------------------|---------|
-| --dry-run                          | Run as a dry run mode. All test files are not overwritten    |         |
-| --enable/disable-struct-conversion | Whether converting test classes to structs or not            | Enabled |
-| --enable/disable-strip-test-prefix | Whether stripping `test` prefix from each test method or not | Enabled |
-| --enable/disable-adding-suite      | Whether adding `@Suite` annotation to each test class or not | Enabled |
+| Option                                   | Description                                                                       | Default |
+|------------------------------------------|-----------------------------------------------------------------------------------|---------|
+| --dry-run                                | Run as a dry run mode. All test files are not overwritten                         |         |
+| --enable/disable-struct-conversion       | Whether converting test classes to structs or not                                 | Enabled |
+| --enable/disable-strip-test-prefix       | Whether stripping `test` prefix from each test method or not                      | Enabled |
+| --enable/disable-adding-suite            | Whether adding `@Suite` annotation to each test class or not                      | Enabled |
+| --enable/disable-attributes-on-same-line | Whether attributes are placed on the same line as the declaration or on top of it | Enabled |
 
 ### Struct Conversion
 
