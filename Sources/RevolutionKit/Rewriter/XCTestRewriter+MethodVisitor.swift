@@ -96,7 +96,7 @@ extension XCTestRewriter {
     
     /// Returns a kind of the method
     private func detectMethodKind(of node: FunctionDeclSyntax) -> MethodKind? {
-        guard !isStaticMethod(node: node) else { return nil }
+        guard !isStaticOrPrivateMethod(node: node) else { return nil }
         
         return switch node.name.text {
         case let name where name.hasPrefix("test"):
@@ -111,10 +111,10 @@ extension XCTestRewriter {
         }
     }
     
-    /// Returns true if the method is static
-    private func isStaticMethod(node: FunctionDeclSyntax) -> Bool {
+    /// Returns true if the method is static or private
+    private func isStaticOrPrivateMethod(node: FunctionDeclSyntax) -> Bool {
         node.modifiers.contains {
-            $0.tokens(viewMode: .sourceAccurate).contains { $0.tokenKind == .keyword(.static) }
+            $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.private)
         }
     }
     

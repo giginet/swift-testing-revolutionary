@@ -76,6 +76,26 @@ private let testCaseConversionFixtures: [ConversionTestFixture] = [
         }
         """
     },
+    Fixture {
+        """
+        private func testExample() {
+        }
+        """
+        """
+        private func testExample() {
+        }
+        """
+    },
+    Fixture {
+        """
+        private static func testExample() {
+        }
+        """
+        """
+        private static func testExample() {
+        }
+        """
+    },
 ]
 
 private let setUpConversionFixtures: [ConversionTestFixture] = [
