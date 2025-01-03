@@ -67,6 +67,9 @@ let package = Package(
             name: "RevolutionKitTests",
             dependencies: [
                 .target(name: "RevolutionKit"),
+            ],
+            exclude: [
+                "Fixtures",
             ]
         ),
     ],
