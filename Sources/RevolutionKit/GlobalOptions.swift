@@ -14,6 +14,9 @@ package struct GlobalOptions: Sendable {
     /// Whether to add `@Suite` to each test class
     var enableAddingSuite: Bool
     
+    /// Whether to put attributes on the same line as the declaration or on top of it
+    var attributesOnSameLine: Bool
+    
     package enum BackUpMode {
         case disabled
         case enabled(URL)
@@ -23,12 +26,14 @@ package struct GlobalOptions: Sendable {
         isDryRunMode: Bool = false,
         enableStructConversion: Bool = true,
         enableStrippingTestPrefix: Bool = true,
-        enableAddingSuite: Bool = true
+        enableAddingSuite: Bool = true,
+        attributesOnSameLine: Bool = true
     ) {
         self.isDryRunMode = isDryRunMode
         self.enableStructConversion = enableStructConversion
         self.enableStrippingTestPrefix = enableStrippingTestPrefix
         self.enableAddingSuite = enableAddingSuite
+        self.attributesOnSameLine = attributesOnSameLine
     }
 }
 

@@ -184,6 +184,33 @@ private let tearDownConversionFixtures: [ConversionTestFixture] = [
     },
 ]
 
+private let attributesOnTopOfDeclaration: [ConversionTestFixture] = [
+    Fixture {
+        """
+        func testExample() {
+        }
+        """
+        """
+        @Test
+        func example() {
+        }
+        """
+    },
+    Fixture {
+        """
+        @ExistingAttribute
+        func testExample() {
+        }
+        """
+        """
+        @Test
+        @ExistingAttribute
+        func example() {
+        }
+        """
+    },
+]
+
 @Suite struct TestMethodsTests {
     private let emitter = StringEmitter()
     
@@ -206,6 +233,14 @@ private let tearDownConversionFixtures: [ConversionTestFixture] = [
     @Test("TestMethodsRewriter can convert tearDown methods", arguments: tearDownConversionFixtures)
     private func rewriteTearDowns(_ fixture: ConversionTestFixture) async throws {
         let runner = Runner()
+        
+        let result = try runner.run(for: fixture.source, emitter: StringEmitter())
+        #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)
+    }
+    
+    @Test("TestMethodsRewriter can put attributes on top of declaration", arguments: attributesOnTopOfDeclaration)
+    private func rewriteTestCasesWithAttributesOnTopOfDeclaration(_ fixture: ConversionTestFixture) async throws {
+        let runner = Runner(globalOptions: .init(attributesOnSameLine: false))
         
         let result = try runner.run(for: fixture.source, emitter: StringEmitter())
         #expect(result == fixture.expected, sourceLocation: fixture.sourceLocation)

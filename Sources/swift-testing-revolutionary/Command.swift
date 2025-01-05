@@ -19,6 +19,11 @@ struct SwiftTestingRevolutionaryCommand: AsyncParsableCommand {
     @Flag(inversion: .prefixedEnableDisable, help: "Whether adding `@Suite` to each test class")
     var addingSuite: Bool = true
     
+    @Flag(inversion: .prefixedEnableDisable, help: """
+        Whether to put attributes on the same line as the declaration or on top of it
+        """)
+    var attributesOnSameLine: Bool = true
+    
     func run() async throws {
         let options = buildRunnerOptions()
         
@@ -33,7 +38,8 @@ struct SwiftTestingRevolutionaryCommand: AsyncParsableCommand {
             isDryRunMode: dryRun,
             enableStructConversion: structConversion,
             enableStrippingTestPrefix: stripTestPrefix,
-            enableAddingSuite: addingSuite
+            enableAddingSuite: addingSuite,
+            attributesOnSameLine: attributesOnSameLine
         )
     }
 }

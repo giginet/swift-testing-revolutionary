@@ -14,7 +14,7 @@ extension XCTestRewriter {
                 attributeName: IdentifierTypeSyntax(
                     name: .identifier("Suite")
                 ),
-                trailingTrivia: .space
+                trailingTrivia: globalOptions.attributesOnSameLine ? .space : .newlines(1)
             )
             
             let newAttributes = {
