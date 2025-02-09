@@ -74,6 +74,14 @@ $ swift package plugin --allow-writing-to-package-directory swift-testing-revolu
 
 ### Command Line Tool
 
+#### Use binary with [mtj0928/nest](https://github.com/mtj0928/nest) (Recommended)
+
+```console
+$ nest install giginet/swift-testing-revolutionary
+```
+
+#### Source from source 
+
 Install this tool and run it from the command line.
 
 ```console
