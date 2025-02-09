@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Universal Binary
-        run: swift build --disable-sandbox -c release --arch arm64 --arch x86_64
+        run: swift build --disable-sandbox -c release --arch arm64 --arch x86_64 --product swift-testing-revolutionary
       - uses: giginet/github-action-artifactbundle@v2
         id: artifactbundle
         with:
