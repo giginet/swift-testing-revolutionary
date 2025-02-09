@@ -1,35 +1,28 @@
-on: 
+on:
   release:
-    types: [created]
-
+    types: [published, edited]
 name: Upload Artifact Bundle to Release
-env: 
-  DEVELOPER_DIR: "/Applications/Xcode_16.0.app/Contents/Developer"
-  SWIFT_TESTING_REVOLUTIONARY_DEVELOPMENT: 1
-
+env:
+  DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
 jobs:
   release:
-    name: Build and Upload Artifact Bundle
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
-      - name: Resolve Dependencies
-        run: |
-          swift package resolve
-      - name: Build Binary
-        run: |
-          swift build --disable-sandbox -c release --arch arm64 --arch x86_64 --product swift-testing-revolutionary
-      - name: Get Current Tag
-        run: echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Make Artifact Bundle
-        run: |
-          swift package --allow-writing-to-package-directory generate-artifact-bundle \
-          --package-version ${{ env.TAG_NAME }} \
-          --executable-name swift-testing-revolutionary \
-          --build-config release \
-          --build-folder .build
+      - uses: actions/checkout@v4
+      - name: Build Universal Binary
+        run: swift build --disable-sandbox -c release --arch arm64 --arch x86_64
+      - uses: giginet/github-action-artifactbundle@v2
+        id: artifactbundle
+        with:
+          artifact_name: swift-testing-revolutionary
       - name: Upload Artifact Bundle to Release
         run: |
-          gh release upload ${{ env.TAG_NAME }} ./swift-testing-revolutionary.artifactbundle.zip
+          BODY="${{ github.event.release.body }}"
+          BUNDLE_PATH="${{ steps.artifactbundle.outputs.bundle_path }}"
+          SHA256="${{ steps.artifactbundle.outputs.bundle_sha256 }}"
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          gh release upload "${TAG_NAME}" "${BUNDLE_PATH}"
+          NEW_BODY="$(printf "%s\n%s" "$BODY" "$SHA256")"
+          gh release edit "${TAG_NAME}" --notes "${NEW_BODY}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

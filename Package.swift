@@ -75,11 +75,3 @@ let package = Package(
     ],
     swiftLanguageModes: [.v6]
 )
-
-let isDevelopment = ProcessInfo.processInfo.environment["SWIFT_TESTING_REVOLUTIONARY_DEVELOPMENT"] == "1"
-
-if isDevelopment {
-    package.dependencies += [
-        .package(url: "https://github.com/freddi-kit/ArtifactBundleGen.git", from: "0.0.6"),
-    ]
-}
