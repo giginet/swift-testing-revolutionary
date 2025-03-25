@@ -6,6 +6,7 @@
 [![SwiftPM](https://img.shields.io/badge/SwiftPM-compatible-green?logo=swift&style=flat-square)](https://swift.org/package-manager/) 
 ![Platforms](https://img.shields.io/badge/Platform-macOS-lightgray?logo=apple&style=flat-square)
 [![License](https://img.shields.io/badge/License-MIT-darkgray?style=flat-square)
+[![libs.tech recommends](https://libs.tech/project/795428825/badge.svg)](https://libs.tech/project/795428825/swift-testing-revolutionary)
 ](https://github.com/giginet/swift-testing-revolutionary/blob/main/LICENSE)
 
 swift-testing-revolutionary converts test cases written in XCTest to [swift-testing](https://github.com/apple/swift-testing)
